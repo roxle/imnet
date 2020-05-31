@@ -1,0 +1,6 @@
+webserver = imnet.dnet.hu:80
+
+webserver {
+  mirror = true;
+  index = "#/index.html";
+}
