@@ -1,0 +1,8 @@
+main = (webserver = True)
+
+start main {
+  port = 80
+  method = https
+}
+
+#INDEX: imnet.dnet.hu/index.html
